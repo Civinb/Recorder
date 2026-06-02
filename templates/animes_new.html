@@ -8,14 +8,32 @@
 <body>
     <h1>Creat new record</h1>
     <h2>Anime</h2>
-    <form action="">
-        <span>Name: </span>
-        <input type="text" placeholder="e.g. STEINS;GATE" name="name">
-        <span></span>
-        <input type="text" placeholder="e.g. STEINS;GATE" name="name">
-        <input type="text" placeholder="e.g. STEINS;GATE" name="name">
-        <input type="text" placeholder="e.g. STEINS;GATE" name="name">
-
+    <form method="POST">
+        <p>
+            <label>Name: </label>
+            <input type="text" placeholder="e.g. STEINS;GATE" name="name">
+        </p>
+        
+        <p>
+            <label>Summary: </label>
+            <input type="text" placeholder="" name="summary">
+        </p>
+        
+        <p>
+            <label>Your review: </label>
+            <input type="text" placeholder="" name="reviews">
+        </p>
+        
+        <p>
+            <label>Bangumi link: </label>
+            <input type="text" placeholder="e.g. https://chii.in/subject/10380" name="bangumi_links">
+        </p>
+        
+        <p>
+            <label>Official link: </label>
+            <input type="text" placeholder="e.g. https://steinsgate.jp/" name="official_links">
+        </p>
+        <button type="submit">Submit</button>
     </form>
 </body>
 </html>

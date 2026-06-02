@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import enum
 app = Flask(__name__)
@@ -62,9 +62,23 @@ def animes():
     return render_template("animes.html", animes=animes)
 
 
-'''@app.route("/animes/new", methods=["GET", "POST"])
-def anime_new():'''
+@app.route("/animes/new", methods=["GET", "POST"])
+def anime_new():
     
+    if request.method == "POST":
+        name = request.form["name"]
+        summary = request.form["summary"]
+        reviews = request.form["reviews"]
+        bangumi_links = request.form["bangumi_links"]
+        official_links = request.form["official_links"]
+        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links)
+        db.session.add(anime_new)
+        db.session.commit()
+        return redirect(url_for('animes'))
+    
+    return render_template('animes_new.html')
+
+
 
 
 
