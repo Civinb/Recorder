@@ -15,12 +15,18 @@ class status(enum.Enum):
     DEFAULT = "Default"
 
 
+class type(enum.Enum):
+    TV = "TV"
+    MOVIE = "Movie"
+    OVA = "OVA"
+
+
 
 class Anime(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
-    type = db.Column(db.String(20), nullable=False)
+    type = db.Column(db.Enum(type), nullable=False, default=type.TV)
     broadcast_date = db.Column(db.String(50), nullable=True)
     summary = db.Column(db.Text, nullable=True)
     score = db.Column(db.Float, nullable=True)
@@ -50,10 +56,17 @@ def power():
 
 
 
-@app.route("/animes", methods=["POST"])
+@app.route("/animes")
 def animes():
     animes = Anime.query.all()
     return render_template("animes.html", animes=animes)
+
+
+'''@app.route("/animes/new", methods=["GET", "POST"])
+def anime_new():'''
+    
+
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
