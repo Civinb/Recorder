@@ -53,7 +53,7 @@ def power():
 @app.route("/animes", methods=["POST"])
 def animes():
     animes = Anime.query.all()
-    return render_template("anime.html", animes=animes)
+    return render_template("animes.html", animes=animes)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
