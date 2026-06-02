@@ -1,6 +1,15 @@
+import uuid
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import enum
+from datetime import datetime
+from werkzeug.utils import secure_filename
+from pathlib import Path
+
+
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
 db = SQLAlchemy(app)
@@ -27,7 +36,7 @@ class Anime(db.Model):
     name = db.Column(db.String(80), nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
     type = db.Column(db.Enum(type), nullable=False, default=type.TV)
-    broadcast_date = db.Column(db.String(50), nullable=True)
+    broadcast_date = db.Column(db.Date, nullable=True)
     summary = db.Column(db.Text, nullable=True)
     score = db.Column(db.Float, nullable=True)
     reviews = db.Column(db.Text, nullable=True)
@@ -38,22 +47,6 @@ class Anime(db.Model):
 
 with app.app_context():
     db.create_all()
-
-'''@app.route("/power", methods=["POST"])
-def power():
-    base = request.json.get("base")
-    exponent = request.json.get("exponent")
-    print(f"Received base: {base}, exponent: {exponent}")
-    if base is None or exponent is None:
-        return jsonify({"error": "Missing 'base' or 'exponent' in request body"})
-    try:
-        result = base ** exponent
-        print(f"Calculated result: {result}")
-        return jsonify({"result": result})
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return jsonify({"error": str(e), "message": "Please try again"})'''
-
 
 
 @app.route("/animes")
@@ -66,12 +59,33 @@ def animes():
 def anime_new():
     
     if request.method == "POST":
+        
         name = request.form["name"]
         summary = request.form["summary"]
         reviews = request.form["reviews"]
         bangumi_links = request.form["bangumi_links"]
         official_links = request.form["official_links"]
-        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links)
+        type = request.form["type"]
+        status = request.form["status"]
+        score = request.form["score"]
+        broadcast_date_str = request.form["broadcast_date"]
+        
+        image_file = request.files["image_file"]
+        image_filename = None
+        if image_file and image_file.filename:
+            ext = Path(image_file.filename).suffix.lower()
+            if ext in ALLOWED_EXTENSIONS:
+                upload_dir = Path("static/uploads")
+                upload_dir.mkdir(parents=True, exist_ok=True)
+                safe_name = f"{uuid.uuid4().hex}{ext}"
+                image_file.save(upload_dir / safe_name)
+        
+        if broadcast_date_str:
+            broadcast_date = datetime.strptime(broadcast_date_str, "%Y-%m-%d").date()
+        else:
+            broadcast_date = None
+
+        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links, broadcast_date=broadcast_date, type=type, status=status, score=score, image_url=safe_name)
         db.session.add(anime_new)
         db.session.commit()
         return redirect(url_for('animes'))

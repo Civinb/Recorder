@@ -8,12 +8,18 @@
 <body>
     <h1>Creat new record</h1>
     <h2>Anime</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <p>
             <label>Name: </label>
             <input type="text" placeholder="e.g. STEINS;GATE" name="name">
         </p>
         
+        <p>
+            <label>Upload Image: </label>
+            <input type="file" name="image_file" accept="image/*">
+        </p>
+
+
         <p>
             <label>Summary: </label>
             <input type="text" placeholder="" name="summary">
@@ -23,7 +29,26 @@
             <label>Your review: </label>
             <input type="text" placeholder="" name="reviews">
         </p>
-        
+
+        <p>
+            <label>Your Score: </label>
+            <input type="number" name="score" min="0" max="10" step="0.1" value="7">
+        </p>
+
+        <p>
+            <label>Type: </label>
+            <select name="type">
+                <option value="TV">TV</option>
+                <option value="MOVIE">Movie</option>
+                <option value="OVA">OVA</option>
+            </select>
+        </p>
+
+        <p>
+            <label>Broadcast date: </label>
+            <input type="date" name="broadcast_date">
+        </p>
+
         <p>
             <label>Bangumi link: </label>
             <input type="text" placeholder="e.g. https://chii.in/subject/10380" name="bangumi_links">
@@ -33,6 +58,19 @@
             <label>Official link: </label>
             <input type="text" placeholder="e.g. https://steinsgate.jp/" name="official_links">
         </p>
+
+        <p>
+            <label>Status: </label>
+            <select name="status">
+                <option value="DEFAULT">Default</option>
+                <option value="WACHING">Watching</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="PLANNING">Planning</option>
+                <option value="DROPPED">Dropped</option>
+                <option value="ON_HOLD">On Hold</option>
+            </select>
+        </p>
+
         <button type="submit">Submit</button>
     </form>
 </body>
