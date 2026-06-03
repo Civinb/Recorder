@@ -149,5 +149,13 @@ def anime_delete(anime_id):
     return redirect(url_for('animes'))
 
 
+@app.route("/settings")
+def settings():
+    return render_template("settings.html")
+
+
+
+
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

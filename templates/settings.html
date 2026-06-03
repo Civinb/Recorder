@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+</head>
+<body>
+    <h1>Settings</h1>
+        <label for="sync-bangumi">Sync Latest Bangumi Data</label>
+        <button id="sync-bangumi">Sync</button>
+        <div id="sync-info"></div>
+    
+    <script>
+        const META_URL = "https://raw.githubusercontent.com/bangumi/Archive/master/aux/latest.json";
+        const btn = document.getElementById("sync-bangumi");
+        const info = document.getElementById("sync-info");
+        btn.addEventListener("click", async() =>{
+            btn.disabled = true;
+            btn.textContent = "Syncing...";
+            info.textContent = "";
+            try{
+                const res = await fetch(META_URL);
+                if (!res.ok) throw new Error("Failed to fetch data");
+                const meta = await res.json();
+                info.textContent = `Latest data updated at: ${meta.updated_at}, downloading...`;
+                const link = document.createElement("a");
+                link.href = meta.browser_download_url;
+                link.download = "meta.name";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                btn.textContent = "Dowloading...";                
+            }
+            catch(err){
+                info.textContent = `Error: ${err.message}`;
+                btn.textContent = "Sync";
+            }
+            finally{
+                btn.disabled = false;
+            }
+        })
+    </script>
+</body>
+</html>
