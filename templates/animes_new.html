@@ -8,22 +8,35 @@
 <body>
     <h1>Creat new record</h1>
     <h2>Anime</h2>
-    <form method="POST" enctype="multipart/form-data">
+
+    <section>
+        <strong>从 Bangumi 搜索导入</strong>
+        <div>
+            <input type="text" id="bgm-search" placeholder="输入动画名（中/日/英），自动从本地 bangumi 索引搜索">
+            <div id="bgm-suggest" hidden></div>
+        </div>
+        <div id="bgm-status"></div>
+    </section>
+
+    <form method="POST" enctype="multipart/form-data" id="anime-form">
+        <input type="hidden" name="bangumi_id" id="bangumi_id">
+
         <p>
             <label>Name: </label>
-            <input type="text" placeholder="e.g. STEINS;GATE" name="name">
+            <input type="text" id="name" placeholder="e.g. STEINS;GATE" name="name">
         </p>
-        
+
         <p>
             <label>Upload Image: </label>
             <input type="file" name="image_file" accept="image/*">
+            <span>（未上传且选了 bangumi 条目时，将自动从 Bangumi 抓取封面）</span>
         </p>
 
         <p>
             <label>Summary: </label>
             <textarea name="summary" id="summary" cols="30" rows="5"></textarea>
         </p>
-        
+
         <p>
             <label>Your review: </label>
             <textarea name="reviews" id="reviews" cols="30" rows="5"></textarea>
@@ -36,7 +49,7 @@
 
         <p>
             <label>Type: </label>
-            <select name="type">
+            <select name="type" id="type">
                 <option value="TV">TV</option>
                 <option value="MOVIE">Movie</option>
                 <option value="OVA">OVA</option>
@@ -45,17 +58,17 @@
 
         <p>
             <label>Broadcast date: </label>
-            <input type="date" name="broadcast_date">
+            <input type="date" name="broadcast_date" id="broadcast_date">
         </p>
 
         <p>
             <label>Bangumi link: </label>
-            <input type="text" placeholder="e.g. https://chii.in/subject/10380" name="bangumi_links">
+            <input type="text" id="bangumi_links" placeholder="e.g. https://chii.in/subject/10380" name="bangumi_links">
         </p>
-        
+
         <p>
             <label>Official link: </label>
-            <input type="text" placeholder="e.g. https://steinsgate.jp/" name="official_links">
+            <input type="text" name="official_links" placeholder="e.g. https://steinsgate.jp/">
         </p>
 
         <p>
@@ -72,5 +85,120 @@
 
         <button type="submit">Submit</button>
     </form>
+
+    <script>
+    (function () {
+        const input = document.getElementById('bgm-search');
+        const suggest = document.getElementById('bgm-suggest');
+        const status = document.getElementById('bgm-status');
+
+        let timer = null;
+        let lastQ = '';
+
+        function debounce(fn, ms) {
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), ms);
+            };
+        }
+
+        async function doSearch(q) {
+            if (!q || q === lastQ) return;
+            lastQ = q;
+            status.textContent = '搜索中...';
+            try {
+                const r = await fetch('/api/bangumi/search?q=' + encodeURIComponent(q));
+                const data = await r.json();
+                if (!data.ok) {
+                    status.textContent = '错误: ' + (data.error || '未知');
+                    suggest.hidden = true;
+                    return;
+                }
+                renderSuggest(data.results);
+                status.textContent = `找到 ${data.results.length} 条结果`;
+            } catch (e) {
+                status.textContent = '请求失败: ' + e.message;
+                suggest.hidden = true;
+            }
+        }
+
+        function renderSuggest(items) {
+            if (!items.length) {
+                suggest.innerHTML = '<div class="item">无结果</div>';
+                suggest.hidden = false;
+                return;
+            }
+            suggest.innerHTML = items.map(it => {
+                const cn = it.name_cn || '';
+                const meta = [it.date, it.score ? '★' + it.score : ''].filter(Boolean).join(' · ');
+                return `<div class="item" data-id="${it.id}">
+                    <div><strong>${escapeHtml(cn || it.name)}</strong>
+                    ${cn && cn !== it.name ? `<span class="meta"> / ${escapeHtml(it.name)}</span>` : ''}</div>
+                    <div class="meta">${escapeHtml(meta)} · id=${it.id}</div>
+                </div>`;
+            }).join('');
+            suggest.hidden = false;
+            suggest.querySelectorAll('.item[data-id]').forEach(el => {
+                el.addEventListener('click', () => selectSubject(parseInt(el.dataset.id, 10)));
+            });
+        }
+
+        function escapeHtml(s) {
+            return (s == null ? '' : String(s))
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        async function selectSubject(id) {
+            status.textContent = '加载详情...';
+            suggest.hidden = true;
+            try {
+                const r = await fetch('/api/bangumi/subject/' + id);
+                const data = await r.json();
+                if (!data.ok) throw new Error(data.error);
+                fillForm(data.subject);
+                status.textContent = `已填入: ${data.subject.name_cn || data.subject.name} (id=${id})`;
+            } catch (e) {
+                status.textContent = '加载失败: ' + e.message;
+            }
+        }
+
+        function fillForm(s) {
+            document.getElementById('bangumi_id').value = s.id;
+            document.getElementById('name').value = s.name_cn || s.name || '';
+            document.getElementById('summary').value = s.summary || '';
+            document.getElementById('bangumi_links').value = 'https://bgm.tv/subject/' + s.id;
+            if (s.date) document.getElementById('broadcast_date').value = s.date;
+            const typeSel = document.getElementById('type');
+            if (s.mapped_type) {
+                for (const opt of typeSel.options) {
+                    if (opt.value === s.mapped_type) { typeSel.value = s.mapped_type; break; }
+                }
+            }
+            input.value = s.name_cn || s.name || '';
+        }
+
+        const debounced = debounce(doSearch, 300);
+        input.addEventListener('input', e => {
+            const q = e.target.value.trim();
+            if (q.length < 1) {
+                suggest.hidden = true;
+                status.textContent = '';
+                return;
+            }
+            debounced(q);
+        });
+
+        // 点击外部关闭下拉
+        document.addEventListener('click', e => {
+            if (!suggest.contains(e.target) && e.target !== input) {
+                suggest.hidden = true;
+            }
+        });
+        input.addEventListener('focus', () => {
+            if (suggest.children.length) suggest.hidden = false;
+        });
+    })();
+    </script>
 </body>
 </html>

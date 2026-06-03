@@ -1,4 +1,5 @@
 import uuid
+import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import enum
@@ -6,8 +7,12 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from pathlib import Path
 
+import bangumi_index
+
 
 ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}  #允许上传的图片文件扩展名集合，包含了常见的图片格式，如JPG、JPEG、PNG、GIF和WEBP等。
+BANGUMI_API_BASE = "https://api.bgm.tv/v0"
+BANGUMI_UA = "Recorder/0.1 (https://github.com/Civinb/Recorder.git)"  # bgm API 要求设置 UA
 
 
 app = Flask(__name__)                                          
@@ -44,9 +49,50 @@ class Anime(db.Model):                                           #数据库中�
     bangumi_links = db.Column(db.String(200), nullable=True)
     official_links = db.Column(db.String(200), nullable=True)
     status = db.Column(db.Enum(status), nullable=False, default=status.DEFAULT)
+    bangumi_id = db.Column(db.Integer, nullable=True, index=True)  # 关联的 bangumi subject id
+
+def _migrate_add_bangumi_id():
+    """对已存在的 anime 表补 bangumi_id 列（轻量迁移）"""
+    with db.engine.connect() as conn:
+        cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(anime)").fetchall()]
+        if cols and "bangumi_id" not in cols:
+            conn.exec_driver_sql("ALTER TABLE anime ADD COLUMN bangumi_id INTEGER")
+            conn.commit()
+
 
 with app.app_context():
     db.create_all()
+    _migrate_add_bangumi_id()
+
+
+def _download_bangumi_cover(subject_id: int) -> str | None:
+    """调 Bangumi API 拿封面 URL 并下载到 static/uploads/，返回文件名"""
+    try:
+        r = requests.get(
+            f"{BANGUMI_API_BASE}/subjects/{subject_id}",
+            headers={"User-Agent": BANGUMI_UA},
+            timeout=10,
+        )
+        if r.status_code != 200:
+            return None
+        data = r.json()
+        img_url = (data.get("images") or {}).get("large")
+        if not img_url:
+            return None
+        img_resp = requests.get(img_url, headers={"User-Agent": BANGUMI_UA}, timeout=15)
+        if img_resp.status_code != 200:
+            return None
+        ext = Path(img_url).suffix.lower() or ".jpg"
+        if ext not in ALLOWED_EXTENSIONS:
+            ext = ".jpg"
+        upload_dir = Path(app.root_path) / "static" / "uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = f"{uuid.uuid4().hex}{ext}"
+        (upload_dir / safe_name).write_bytes(img_resp.content)
+        return safe_name
+    except Exception as e:
+        app.logger.warning(f"下载 bangumi 封面失败 (id={subject_id}): {e}")
+        return None
 
 
 @app.route("/animes")                                   
@@ -59,7 +105,7 @@ def animes():
 def anime_new():
     
     if request.method == "POST":
-        
+
         name = request.form["name"]
         summary = request.form["summary"]
         reviews = request.form["reviews"]
@@ -68,8 +114,11 @@ def anime_new():
         type = request.form["type"]
         status = request.form["status"]
         score = float(request.form["score"])
-        
-        image_file = request.files["image_file"]
+        bangumi_id_raw = request.form.get("bangumi_id", "").strip()
+        bangumi_id = int(bangumi_id_raw) if bangumi_id_raw.isdigit() else None
+
+        safe_name = None
+        image_file = request.files.get("image_file")
         if image_file and image_file.filename:
             ext = Path(image_file.filename).suffix.lower()
             if ext in ALLOWED_EXTENSIONS:
@@ -77,19 +126,60 @@ def anime_new():
                 upload_dir.mkdir(parents=True, exist_ok=True)
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 image_file.save(upload_dir / safe_name)
-        
+
+        # 用户未手动上传图片但有 bangumi_id → 自动抓封面
+        if not safe_name and bangumi_id:
+            safe_name = _download_bangumi_cover(bangumi_id)
+
         broadcast_date_str = request.form["broadcast_date"]
         if broadcast_date_str:
             broadcast_date = datetime.strptime(broadcast_date_str, "%Y-%m-%d").date()
         else:
             broadcast_date = None
 
-        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links, broadcast_date=broadcast_date, type=type, status=status, score=score, image_url=safe_name)
+        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links, broadcast_date=broadcast_date, type=type, status=status, score=score, image_url=safe_name, bangumi_id=bangumi_id)
         db.session.add(anime_new)
         db.session.commit()
         return redirect(url_for('animes'))
-    
+
     return render_template('animes_new.html')
+
+
+# ---------------- Bangumi 索引相关 API ----------------
+
+@app.route("/api/bangumi/index/info")
+def bangumi_index_info():
+    return jsonify(bangumi_index.index_info())
+
+
+@app.route("/api/bangumi/index/build", methods=["POST"])
+def bangumi_index_build():
+    try:
+        result = bangumi_index.build_index()
+        return jsonify({"ok": True, **result})
+    except FileNotFoundError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    except Exception as e:
+        app.logger.exception("构建 bangumi 索引失败")
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/bangumi/search")
+def bangumi_search():
+    q = request.args.get("q", "")
+    try:
+        results = bangumi_index.search(q, limit=15)
+        return jsonify({"ok": True, "results": results})
+    except FileNotFoundError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+
+
+@app.route("/api/bangumi/subject/<int:subject_id>")
+def bangumi_subject(subject_id):
+    data = bangumi_index.get_subject(subject_id)
+    if not data:
+        return jsonify({"ok": False, "error": "未找到该条目"}), 404
+    return jsonify({"ok": True, "subject": data})
 
 
 
