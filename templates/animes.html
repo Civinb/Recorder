@@ -9,8 +9,14 @@
     <h1>Anime List</h1>
     <ul>
         {% for anime in animes %}
-            <li>{{ anime.name }}</li>
+
+            <li>
+                <a href="{{url_for('anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a>
+            </li>
+            
         {% endfor %}
     </ul>
+    <hr>
+    <a href="{{url_for('anime_new')}}">Add New Anime</a>
 </body>
 </html>
