@@ -11,13 +11,13 @@
         {% for anime in animes %}
 
             <li>
-                <a href="{{url_for('anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a>
+                <a href="{{url_for('anime.anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a>
             </li>
             
         {% endfor %}
     </ul>
     <hr>
-    <a href="{{url_for('anime_new')}}">Add New Anime</a>
+    <a href="{{url_for('anime.anime_new')}}">Add New Anime</a>
     <a href="{{url_for('settings')}}">Settings</a>
 </body>
 </html>

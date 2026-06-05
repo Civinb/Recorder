@@ -178,7 +178,7 @@
             input.value = s.name_cn || s.name || '';
         }
 
-        const debounced = debounce(doSearch, 300);
+        const debounced = debounce(doSearch, 500);
         input.addEventListener('input', e => {
             const q = e.target.value.trim();
             if (q.length < 1) {
