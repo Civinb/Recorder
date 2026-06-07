@@ -20,6 +20,11 @@ with app.app_context():
 app.register_blueprint(anime_bp)
 
 
+@app.route("/home")
+def home():
+    return render_template("home.html")
+
+
 @app.route("/settings")
 def settings():
     return render_template("settings.html")

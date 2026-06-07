@@ -1,7 +1,6 @@
 from flask import Blueprint, request, redirect, render_template, url_for, jsonify
 import requests
 from flask_sqlalchemy import SQLAlchemy
-import enum
 from pathlib import Path
 import uuid
 from models import Anime
@@ -149,7 +148,7 @@ def bangumi_subject(subject_id):
         return jsonify({"ok": False, "error": "未找到该条目"}), 404
     return jsonify({"ok": True, "subject": data})
 
-
+# ------------------------------------------------------------
 
 @anime_bp.route("/<int:anime_id>")                                 #处理/animes/<anime_id>路径的GET请求，用于显示指定ID的动漫详情页面。
 def anime_detail(anime_id):
