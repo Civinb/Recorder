@@ -33,7 +33,7 @@ def _migrate_add_bangumi_id():
 @anime_bp.route("/list")                                   
 def animes():
     animes = Anime.query.all()
-    return render_template("animes.html", animes=animes)
+    return render_template("animes_list.html", animes=animes)
 
 
 @anime_bp.route("/new", methods=["GET", "POST"])                 #处理/animes/new路径的GET和POST请求，GET请求用于显示添加新动漫的表单页面，POST请求用于处理表单提交的数据并将新动漫添加到数据库中。
@@ -205,3 +205,12 @@ def anime_delete(anime_id):
     db.session.delete(anime)
     db.session.commit()
     return redirect(url_for('anime.animes'))
+
+@anime_bp.route("/list/search")
+def anime_search():
+    q = request.args.get("q", "")
+    try:
+        results = bangumi_index.search(q, limit=15)
+        return jsonify({"ok": True, "results": results})
+    except FileNotFoundError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400

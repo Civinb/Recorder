@@ -95,19 +95,19 @@
         let timer = null;
         let lastQ = '';
 
-        function debounce(fn, ms) {
+        function debounce(fn, ms) {                                        //防抖函数，fn为延迟执行的函数，ms为延迟时间
             return (...args) => {
                 clearTimeout(timer);
                 timer = setTimeout(() => fn(...args), ms);
             };
         }
 
-        async function doSearch(q) {
+        async function doSearch(q) {                                        //搜索函数，staus输出状态
             if (!q || q === lastQ) return;
             lastQ = q;
             status.textContent = '搜索中...';
             try {
-                const r = await fetch('/api/bangumi/search?q=' + encodeURIComponent(q));
+                const r = await fetch('/animes/api/bangumi/search?q=' + encodeURIComponent(q));
                 const data = await r.json();
                 if (!data.ok) {
                     status.textContent = '错误: ' + (data.error || '未知');
@@ -122,7 +122,7 @@
             }
         }
 
-        function renderSuggest(items) {
+        function renderSuggest(items) {                                     //搜索结果显示
             if (!items.length) {
                 suggest.innerHTML = '<div class="item">无结果</div>';
                 suggest.hidden = false;
@@ -143,17 +143,17 @@
             });
         }
 
-        function escapeHtml(s) {
+        function escapeHtml(s) {                                               //防止名称内有包含语法含义的字符
             return (s == null ? '' : String(s))
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        async function selectSubject(id) {
+        async function selectSubject(id) {                                      //点击选项后将bangumi.db中的数据填入表单中
             status.textContent = '加载详情...';
             suggest.hidden = true;
             try {
-                const r = await fetch('/api/bangumi/subject/' + id);
+                const r = await fetch('/animes/api/bangumi/subject/' + id);
                 const data = await r.json();
                 if (!data.ok) throw new Error(data.error);
                 fillForm(data.subject);
@@ -163,7 +163,7 @@
             }
         }
 
-        function fillForm(s) {
+        function fillForm(s) {                                                  //填入表单函数
             document.getElementById('bangumi_id').value = s.id;
             document.getElementById('name').value = s.name_cn || s.name || '';
             document.getElementById('summary').value = s.summary || '';

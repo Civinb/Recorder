@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime List</title>
+</head>
+<body>
+    <h1>Anime List</h1>
+    <input type="text" placeholder="请输入名称" id="anime_search">
+    <table id="table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">名称</th>
+                <th onclick="sortTable(1)">放映日期</th>
+                <th onclick="sortTable(2)">类型</th>
+                <th onclick="sortTable(3)">状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for anime in animes %}
+            <tr id="animetr">
+                <td><a href="{{url_for('anime.anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a></td>
+                <td>{{ anime.broadcast_date.strftime('%m-%d-%Y') if anime.broadcast_date else "" }}</td>
+                <td>{{ anime.type.value}}</td>
+                <td>{{ anime.status.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <a href="{{url_for('anime.anime_new')}}">Add New Anime</a>
+    <a href="{{url_for('settings')}}">Settings</a>
+
+
+    <script>
+        let od = true; 
+        let timer;
+        const input = document.getElementById("anime_search")
+        function sortTable(index){
+            const tbody = document.querySelector("#table tbody");
+            const rows = Array.from(tbody.rows);
+            rows.sort((a,b) => {
+                let x = a.cells[index].innerText;
+                let y = b.cells[index].innerText;
+                const nx = parseFloat(x);
+                const ny = parseFloat(y);
+                if (!isNaN(nx) && !isNaN(ny)){
+                    return od ? nx - ny : ny - nx;
+                }
+                return od ? x.localeCompare(y) : y.localeCompare(x);
+            })
+            od = !od;
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        function search(astext){
+            const rows = document.querySelectorAll("#table tbody tr");
+            rows.forEach(row => {
+                const name = row.cells[0].innerText.toLowerCase();
+                if (name.includes(astext.toLowerCase())){
+                    row.style.display = "";
+                }
+                else {
+                    row.style.display = "none";
+                }   
+            })  
+        }
+        
+        
+        function debounce(fn, ms) {                                        //防抖函数，fn为延迟执行的函数，ms为延迟时间
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), ms);
+            };
+        }
+        
+        const debounced = debounce(search, 300);
+        
+        input.addEventListener("input", e =>{
+            const value = e.target.value.trim();
+            if (value.length<1){
+                debounced(value);
+            }
+            debounced(value);
+        })
+
+
+
+
+
+    </script>
+</body>
+</html>
