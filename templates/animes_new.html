@@ -1,210 +1,202 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
-    <title>animes_new</title>
-</head>
-<body>
-    <header>
-        <h1>Creat new record</h1>
-        <h2>Anime</h2>
-    </header>
-    <main>
-    <section>
-        <strong>从 Bangumi 搜索导入</strong>
-        <div>
-            <input type="text" id="bgm-search" placeholder="输入动画名（中/日/英），自动从本地 bangumi 索引搜索">
-            <div id="bgm-suggest" hidden></div>
-        </div>
-        <div id="bgm-status"></div>
-    </section>
+{% extends "base.html" %}
 
-    <form method="POST" enctype="multipart/form-data" id="anime-form">
-        <input type="hidden" name="bangumi_id" id="bangumi_id">
+{% block title %}New Anime{% endblock %}
 
-        <p>
-            <label>Name: </label>
-            <input type="text" id="name" placeholder="e.g. STEINS;GATE" name="name">
-        </p>
+{% block header %}
+{{ super() }}
+<h1>Creat new record</h1>
+<h2>Anime</h2>
+{% endblock %}
 
-        <p>
-            <label>Upload Image: </label>
-            <input type="file" name="image_file" accept="image/*">
-            <span>（未上传且选了 bangumi 条目时，将自动从 Bangumi 抓取封面）</span>
-        </p>
+{% block content %}
+<section>
+    <strong>从 Bangumi 搜索导入</strong>
+    <div>
+        <input type="text" id="bgm-search" placeholder="输入动画名（中/日/英），自动从本地 bangumi 索引搜索">
+        <div id="bgm-suggest" hidden></div>
+    </div>
+    <div id="bgm-status"></div>
+</section>
 
-        <p>
-            <label>Summary: </label>
-            <textarea name="summary" id="summary" cols="30" rows="5"></textarea>
-        </p>
+<form method="POST" enctype="multipart/form-data" id="anime-form">
+    <input type="hidden" name="bangumi_id" id="bangumi_id">
 
-        <p>
-            <label>Your review: </label>
-            <textarea name="reviews" id="reviews" cols="30" rows="5"></textarea>
-        </p>
+    <p>
+        <label>Name: </label>
+        <input type="text" id="name" placeholder="e.g. STEINS;GATE" name="name">
+    </p>
 
-        <p>
-            <label>Your Score: </label>
-            <input type="number" name="score" min="0" max="10" step="0.1" value="7">
-        </p>
+    <p>
+        <label>Upload Image: </label>
+        <input type="file" name="image_file" accept="image/*">
+        <span>（未上传且选了 bangumi 条目时，将自动从 Bangumi 抓取封面）</span>
+    </p>
 
-        <p>
-            <label>Type: </label>
-            <select name="type" id="type">
-                <option value="TV">TV</option>
-                <option value="MOVIE">Movie</option>
-                <option value="OVA">OVA</option>
-            </select>
-        </p>
+    <p>
+        <label>Summary: </label>
+        <textarea name="summary" id="summary" cols="30" rows="5"></textarea>
+    </p>
 
-        <p>
-            <label>Broadcast date: </label>
-            <input type="date" name="broadcast_date" id="broadcast_date">
-        </p>
+    <p>
+        <label>Your review: </label>
+        <textarea name="reviews" id="reviews" cols="30" rows="5"></textarea>
+    </p>
 
-        <p>
-            <label>Bangumi link: </label>
-            <input type="text" id="bangumi_links" placeholder="e.g. https://chii.in/subject/10380" name="bangumi_links">
-        </p>
+    <p>
+        <label>Your Score: </label>
+        <input type="number" name="score" min="0" max="10" step="0.1" value="7">
+    </p>
 
-        <p>
-            <label>Official link: </label>
-            <input type="text" name="official_links" placeholder="e.g. https://steinsgate.jp/">
-        </p>
+    <p>
+        <label>Type: </label>
+        <select name="type" id="type">
+            <option value="TV">TV</option>
+            <option value="MOVIE">Movie</option>
+            <option value="OVA">OVA</option>
+        </select>
+    </p>
 
-        <p>
-            <label>Status: </label>
-            <select name="status">
-                <option value="DEFAULT">Default</option>
-                <option value="WACHING">Watching</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="PLANNING">Planning</option>
-                <option value="DROPPED">Dropped</option>
-                <option value="ON_HOLD">On Hold</option>
-            </select>
-        </p>
+    <p>
+        <label>Broadcast date: </label>
+        <input type="date" name="broadcast_date" id="broadcast_date">
+    </p>
 
-        <button type="submit">Submit</button>
-    </form>
-    </main>
-    <footer></footer>
+    <p>
+        <label>Bangumi link: </label>
+        <input type="text" id="bangumi_links" placeholder="e.g. https://chii.in/subject/10380" name="bangumi_links">
+    </p>
 
-    <script>
-    (function () {
-        const input = document.getElementById('bgm-search');
-        const suggest = document.getElementById('bgm-suggest');
-        const status = document.getElementById('bgm-status');
+    <p>
+        <label>Official link: </label>
+        <input type="text" name="official_links" placeholder="e.g. https://steinsgate.jp/">
+    </p>
 
-        let timer = null;
-        let lastQ = '';
+    <p>
+        <label>Status: </label>
+        <select name="status">
+            <option value="DEFAULT">Default</option>
+            <option value="WACHING">Watching</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="PLANNING">Planning</option>
+            <option value="DROPPED">Dropped</option>
+            <option value="ON_HOLD">On Hold</option>
+        </select>
+    </p>
 
-        function debounce(fn, ms) {                                        //防抖函数，fn为延迟执行的函数，ms为延迟时间
-            return (...args) => {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn(...args), ms);
-            };
-        }
+    <button type="submit">Submit</button>
+</form>
 
-        async function doSearch(q) {                                        //搜索函数，staus输出状态
-            if (!q || q === lastQ) return;
-            lastQ = q;
-            status.textContent = '搜索中...';
-            try {
-                const r = await fetch('/animes/api/bangumi/search?q=' + encodeURIComponent(q));
-                const data = await r.json();
-                if (!data.ok) {
-                    status.textContent = '错误: ' + (data.error || '未知');
-                    suggest.hidden = true;
-                    return;
-                }
-                renderSuggest(data.results);
-                status.textContent = `找到 ${data.results.length} 条结果`;
-            } catch (e) {
-                status.textContent = '请求失败: ' + e.message;
+<script>
+(function () {
+    const input = document.getElementById('bgm-search');
+    const suggest = document.getElementById('bgm-suggest');
+    const status = document.getElementById('bgm-status');
+
+    let timer = null;
+    let lastQ = '';
+
+    function debounce(fn, ms) {
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn(...args), ms);
+        };
+    }
+
+    async function doSearch(q) {
+        if (!q || q === lastQ) return;
+        lastQ = q;
+        status.textContent = '搜索中...';
+        try {
+            const r = await fetch('/animes/api/bangumi/search?q=' + encodeURIComponent(q));
+            const data = await r.json();
+            if (!data.ok) {
+                status.textContent = '错误: ' + (data.error || '未知');
                 suggest.hidden = true;
-            }
-        }
-
-        function renderSuggest(items) {                                     //搜索结果显示
-            if (!items.length) {
-                suggest.innerHTML = '<div class="item">无结果</div>';
-                suggest.hidden = false;
                 return;
             }
-            suggest.innerHTML = items.map(it => {
-                const cn = it.name_cn || '';
-                const meta = [it.date, it.score ? '★' + it.score : ''].filter(Boolean).join(' · ');
-                return `<div class="item" data-id="${it.id}">
-                    <div><strong>${escapeHtml(cn || it.name)}</strong>
-                    ${cn && cn !== it.name ? `<span class="meta"> / ${escapeHtml(it.name)}</span>` : ''}</div>
-                    <div class="meta">${escapeHtml(meta)} · id=${it.id}</div>
-                </div>`;
-            }).join('');
-            suggest.hidden = false;
-            suggest.querySelectorAll('.item[data-id]').forEach(el => {
-                el.addEventListener('click', () => selectSubject(parseInt(el.dataset.id, 10)));
-            });
-        }
-
-        function escapeHtml(s) {                                               //防止名称内有包含语法含义的字符
-            return (s == null ? '' : String(s))
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-
-        async function selectSubject(id) {                                      //点击选项后将bangumi.db中的数据填入表单中
-            status.textContent = '加载详情...';
+            renderSuggest(data.results);
+            status.textContent = `找到 ${data.results.length} 条结果`;
+        } catch (e) {
+            status.textContent = '请求失败: ' + e.message;
             suggest.hidden = true;
-            try {
-                const r = await fetch('/animes/api/bangumi/subject/' + id);
-                const data = await r.json();
-                if (!data.ok) throw new Error(data.error);
-                fillForm(data.subject);
-                status.textContent = `已填入: ${data.subject.name_cn || data.subject.name} (id=${id})`;
-            } catch (e) {
-                status.textContent = '加载失败: ' + e.message;
+        }
+    }
+
+    function renderSuggest(items) {
+        if (!items.length) {
+            suggest.innerHTML = '<div class="item">无结果</div>';
+            suggest.hidden = false;
+            return;
+        }
+        suggest.innerHTML = items.map(it => {
+            const cn = it.name_cn || '';
+            const meta = [it.date, it.score ? '★' + it.score : ''].filter(Boolean).join(' · ');
+            return `<div class="item" data-id="${it.id}">
+                <div><strong>${escapeHtml(cn || it.name)}</strong>
+                ${cn && cn !== it.name ? `<span class="meta"> / ${escapeHtml(it.name)}</span>` : ''}</div>
+                <div class="meta">${escapeHtml(meta)} · id=${it.id}</div>
+            </div>`;
+        }).join('');
+        suggest.hidden = false;
+        suggest.querySelectorAll('.item[data-id]').forEach(el => {
+            el.addEventListener('click', () => selectSubject(parseInt(el.dataset.id, 10)));
+        });
+    }
+
+    function escapeHtml(s) {
+        return (s == null ? '' : String(s))
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    async function selectSubject(id) {
+        status.textContent = '加载详情...';
+        suggest.hidden = true;
+        try {
+            const r = await fetch('/animes/api/bangumi/subject/' + id);
+            const data = await r.json();
+            if (!data.ok) throw new Error(data.error);
+            fillForm(data.subject);
+            status.textContent = `已填入: ${data.subject.name_cn || data.subject.name} (id=${id})`;
+        } catch (e) {
+            status.textContent = '加载失败: ' + e.message;
+        }
+    }
+
+    function fillForm(s) {
+        document.getElementById('bangumi_id').value = s.id;
+        document.getElementById('name').value = s.name_cn || s.name || '';
+        document.getElementById('summary').value = s.summary || '';
+        document.getElementById('bangumi_links').value = 'https://bgm.tv/subject/' + s.id;
+        if (s.date) document.getElementById('broadcast_date').value = s.date;
+        const typeSel = document.getElementById('type');
+        if (s.mapped_type) {
+            for (const opt of typeSel.options) {
+                if (opt.value === s.mapped_type) { typeSel.value = s.mapped_type; break; }
             }
         }
+        input.value = s.name_cn || s.name || '';
+    }
 
-        function fillForm(s) {                                                  //填入表单函数
-            document.getElementById('bangumi_id').value = s.id;
-            document.getElementById('name').value = s.name_cn || s.name || '';
-            document.getElementById('summary').value = s.summary || '';
-            document.getElementById('bangumi_links').value = 'https://bgm.tv/subject/' + s.id;
-            if (s.date) document.getElementById('broadcast_date').value = s.date;
-            const typeSel = document.getElementById('type');
-            if (s.mapped_type) {
-                for (const opt of typeSel.options) {
-                    if (opt.value === s.mapped_type) { typeSel.value = s.mapped_type; break; }
-                }
-            }
-            input.value = s.name_cn || s.name || '';
+    const debounced = debounce(doSearch, 500);
+    input.addEventListener('input', e => {
+        const q = e.target.value.trim();
+        if (q.length < 1) {
+            suggest.hidden = true;
+            status.textContent = '';
+            return;
         }
+        debounced(q);
+    });
 
-        const debounced = debounce(doSearch, 500);
-        input.addEventListener('input', e => {
-            const q = e.target.value.trim();
-            if (q.length < 1) {
-                suggest.hidden = true;
-                status.textContent = '';
-                return;
-            }
-            debounced(q);
-        });
-
-        // 点击外部关闭下拉
-        document.addEventListener('click', e => {
-            if (!suggest.contains(e.target) && e.target !== input) {
-                suggest.hidden = true;
-            }
-        });
-        input.addEventListener('focus', () => {
-            if (suggest.children.length) suggest.hidden = false;
-        });
-    })();
-    </script>
-</body>
-</html>
+    document.addEventListener('click', e => {
+        if (!suggest.contains(e.target) && e.target !== input) {
+            suggest.hidden = true;
+        }
+    });
+    input.addEventListener('focus', () => {
+        if (suggest.children.length) suggest.hidden = false;
+    });
+})();
+</script>
+{% endblock %}

@@ -1,104 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
-    <title>Settings</title>
-</head>
-<body>
-    <header>
-        <h1>Settings</h1>
-    </header>
-    <main>
-    <section>
-        <label for="sync-bangumi">Sync Latest Bangumi Data</label>
-        <button id="sync-bangumi">Sync</button>
-        <div id="sync-info"></div>
-        <p>下载完成后请把 zip 放到 <code>static/bangumi_data/</code> 目录</p>
-    </section>
+{% extends "base.html" %}
 
-    <hr>
+{% block title %}Settings{% endblock %}
 
-    <section>
-        <h2>Bangumi 索引</h2>
-        <div id="index-info">检查中...</div>
-        <button id="extract-bangumi">Extract / Rebuild Index</button>
-        <div id="extract-info"></div>
-        <p>从最新的 zip 中提取动画条目到独立 SQLite 索引（含全文搜索）。耗时约 1-3 分钟，期间页面会等待。</p>
-    </section>
-    </main>
-    <footer></footer>
+{% block header %}
+{{ super() }}
+<h1>Settings</h1>
+{% endblock %}
 
-    <script>
-        const META_URL = "https://raw.githubusercontent.com/bangumi/Archive/master/aux/latest.json";
-        const btn = document.getElementById("sync-bangumi");
-        const info = document.getElementById("sync-info");
-        btn.addEventListener("click", async() =>{
-            btn.disabled = true;
-            btn.textContent = "Syncing...";
-            info.textContent = "";
-            try{
-                const res = await fetch(META_URL);
-                if (!res.ok) throw new Error("Failed to fetch data");
-                const meta = await res.json();
-                info.textContent = `Latest data updated at: ${meta.updated_at}, downloading...`;
-                const link = document.createElement("a");
-                link.href = meta.browser_download_url;
-                link.download = "meta.name";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                btn.textContent = "Dowloading...";
-            }
-            catch(err){
-                info.textContent = `Error: ${err.message}`;
-                btn.textContent = "Sync";
-            }
-            finally{
-                btn.disabled = false;
-            }
-        })
+{% block content %}
+<section>
+    <label for="sync-bangumi">Sync Latest Bangumi Data</label>
+    <button id="sync-bangumi">Sync</button>
+    <div id="sync-info"></div>
+    <p>下载完成后请把 zip 放到 <code>static/bangumi_data/</code> 目录</p>
+</section>
 
-        // --- Bangumi 索引 ---
-        const indexInfoEl = document.getElementById("index-info");
-        const extractBtn = document.getElementById("extract-bangumi");
-        const extractInfo = document.getElementById("extract-info");
+<hr>
 
-        async function refreshIndexInfo() {
-            try {
-                const r = await fetch("/animes/api/bangumi/index/info");
-                const data = await r.json();
-                if (data.exists) {
-                    indexInfoEl.textContent = `当前索引: ${data.count} 条动画 (来源: ${data.source || '?'})`;
-                } else {
-                    indexInfoEl.textContent = "尚未建立索引";
-                }
-            } catch (e) {
-                indexInfoEl.textContent = "无法获取索引状态: " + e.message;
-            }
+<section>
+    <h2>Bangumi 索引</h2>
+    <div id="index-info">检查中...</div>
+    <button id="extract-bangumi">Extract / Rebuild Index</button>
+    <div id="extract-info"></div>
+    <p>从最新的 zip 中提取动画条目到独立 SQLite 索引（含全文搜索）。耗时约 1-3 分钟，期间页面会等待。</p>
+</section>
+
+<script>
+    const META_URL = "https://raw.githubusercontent.com/bangumi/Archive/master/aux/latest.json";
+    const btn = document.getElementById("sync-bangumi");
+    const info = document.getElementById("sync-info");
+    btn.addEventListener("click", async() =>{
+        btn.disabled = true;
+        btn.textContent = "Syncing...";
+        info.textContent = "";
+        try{
+            const res = await fetch(META_URL);
+            if (!res.ok) throw new Error("Failed to fetch data");
+            const meta = await res.json();
+            info.textContent = `Latest data updated at: ${meta.updated_at}, downloading...`;
+            const link = document.createElement("a");
+            link.href = meta.browser_download_url;
+            link.download = "meta.name";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            btn.textContent = "Dowloading...";
         }
-        refreshIndexInfo();
+        catch(err){
+            info.textContent = `Error: ${err.message}`;
+            btn.textContent = "Sync";
+        }
+        finally{
+            btn.disabled = false;
+        }
+    })
 
-        extractBtn.addEventListener("click", async () => {
-            if (!confirm("将从最新 zip 中重建索引，可能需要 1-3 分钟，是否继续？")) return;
-            extractBtn.disabled = true;
-            extractBtn.textContent = "Extracting...";
-            extractInfo.textContent = "处理中，请勿关闭页面...";
-            try {
-                const r = await fetch("/animes/api/bangumi/index/build", { method: "POST" });
-                const data = await r.json();
-                if (!data.ok) throw new Error(data.error || "未知错误");
-                extractInfo.textContent = `完成: 共提取 ${data.count} 条动画 (来源 ${data.source})`;
-                refreshIndexInfo();
-            } catch (e) {
-                extractInfo.textContent = "失败: " + e.message;
-            } finally {
-                extractBtn.disabled = false;
-                extractBtn.textContent = "Extract / Rebuild Index";
+    const indexInfoEl = document.getElementById("index-info");
+    const extractBtn = document.getElementById("extract-bangumi");
+    const extractInfo = document.getElementById("extract-info");
+
+    async function refreshIndexInfo() {
+        try {
+            const r = await fetch("/animes/api/bangumi/index/info");
+            const data = await r.json();
+            if (data.exists) {
+                indexInfoEl.textContent = `当前索引: ${data.count} 条动画 (来源: ${data.source || '?'})`;
+            } else {
+                indexInfoEl.textContent = "尚未建立索引";
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (e) {
+            indexInfoEl.textContent = "无法获取索引状态: " + e.message;
+        }
+    }
+    refreshIndexInfo();
+
+    extractBtn.addEventListener("click", async () => {
+        if (!confirm("将从最新 zip 中重建索引，可能需要 1-3 分钟，是否继续？")) return;
+        extractBtn.disabled = true;
+        extractBtn.textContent = "Extracting...";
+        extractInfo.textContent = "处理中，请勿关闭页面...";
+        try {
+            const r = await fetch("/animes/api/bangumi/index/build", { method: "POST" });
+            const data = await r.json();
+            if (!data.ok) throw new Error(data.error || "未知错误");
+            extractInfo.textContent = `完成: 共提取 ${data.count} 条动画 (来源 ${data.source})`;
+            refreshIndexInfo();
+        } catch (e) {
+            extractInfo.textContent = "失败: " + e.message;
+        } finally {
+            extractBtn.disabled = false;
+            extractBtn.textContent = "Extract / Rebuild Index";
+        }
+    });
+</script>
+{% endblock %}
