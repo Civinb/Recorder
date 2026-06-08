@@ -9,19 +9,33 @@
 
 {% block content %}
 <input type="text" placeholder="请输入名称" id="anime_search">
-<button id="filterBT" onclick=""></button>
 
-<dialog>
-    
+
+<button id="filterBT" onclick="document.getElementById('filterTable').showModal()">Sort</button>
+
+
+<dialog id="filterTable">
+    <header>
+    </header>
+    <form id="filterForm" onsubmit="applyFilter(event)">
+        <main>
+            <label for="typeSelect">
+                <select name="typeSelect" id="typeSelect">
+                    <option value="">所有</option>
+                    <option value="TV">TV</option>
+                    <option value="Movie">Movie</option>
+                    <option value="OVA">OVA</option>
+                </select>
+            </label>
+        </main>
+        <footer>
+            <button type="submit">Confirm</button>
+            <button onclick="document.getElementById('filterTable').close()">Back</button>
+        </footer>
+    </form>
 </dialog>
 
 
-<details class="Dropdown">
-    <summary>sort by</summary>
-    <ul>
-        <li><a href=""></a></li>
-    </ul>
-</details>
 <table id="table">
     <thead>
         <tr>
@@ -44,9 +58,23 @@
 </table>
 
 <script>
+    // 状态变量
     let od = true;
     let timer;
+    let astext = "";
+
+    // DOM 引用
     const input = document.getElementById("anime_search")
+
+    // 通用工具
+    function debounce(fn, ms) {                                        //防抖函数，fn为延迟执行的函数，ms为延迟时间
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn(...args), ms);
+        };
+    }
+
+    // 排序
     function sortTable(index){
         const tbody = document.querySelector("#table tbody");
         const rows = Array.from(tbody.rows);
@@ -64,35 +92,41 @@
         rows.forEach(row => tbody.appendChild(row));
     }
 
-    function search(astext){
+    // 筛选引擎：搜索词 + 类型，两个条件都满足才显示
+    function filterRows(){
         const rows = document.querySelectorAll("#table tbody tr");
-        rows.forEach(row => {
+        const aimtype = document.getElementById('typeSelect').value;
+        rows.forEach(row =>{
             const name = row.cells[0].innerText.toLowerCase();
-            if (name.includes(astext.toLowerCase())){
-                row.style.display = "";
-            }
-            else {
-                row.style.display = "none";
-            }
+            const type = row.cells[2].innerText;
+            const matchSearch = name.includes(astext.toLowerCase());
+            const matchType = type === aimtype || aimtype === "";
+            row.style.display = (matchSearch && matchType) ? "" : "none";
         })
     }
 
-    function debounce(fn, ms) {                                        //防抖函数，fn为延迟执行的函数，ms为延迟时间
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn(...args), ms);
-        };
+    // 搜索：更新搜索词后统一筛选
+    function search(text){
+        astext = text;
+        filterRows();
     }
 
+    // 类型筛选：统一筛选后关闭弹窗
+    function applyFilter(event) {
+        event.preventDefault();
+        filterRows();
+        document.getElementById('filterTable').close();
+    }
+
+    // 事件接线
     const debounced = debounce(search, 300);
 
     input.addEventListener("input", e =>{
         const value = e.target.value.trim();
-        if (value.length<1){
-            debounced(value);
-        }
         debounced(value);
     })
+
+
 </script>
 {% endblock %}
 
