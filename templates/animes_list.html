@@ -19,7 +19,50 @@
     </header>
     <form id="filterForm" onsubmit="applyFilter(event)">
         <main>
-            <label for="typeSelect">
+            <label for="yearSelect"> 年份
+                <select name="yearSelect" id="yearSelect">
+                    <option value="">所有</option>
+                    <option value="1990">1990</option>
+                    <option value="1991">1991</option>
+                    <option value="1992">1992</option>
+                    <option value="1993">1993</option>
+                    <option value="1994">1994</option>
+                    <option value="1995">1995</option>
+                    <option value="1996">1996</option>
+                    <option value="1997">1997</option>
+                    <option value="1998">1998</option>
+                    <option value="1999">1999</option>
+                    <option value="2000">2000</option>
+                    <option value="2001">2001</option>
+                    <option value="2002">2002</option>
+                    <option value="2003">2003</option>
+                    <option value="2004">2004</option>
+                    <option value="2005">2005</option>
+                    <option value="2006">2006</option>
+                    <option value="2007">2007</option>
+                    <option value="2008">2008</option>
+                    <option value="2009">2009</option>
+                    <option value="2010">2010</option>
+                    <option value="2011">2011</option>
+                    <option value="2012">2012</option>
+                    <option value="2013">2013</option>
+                    <option value="2014">2014</option>
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+            </label>
+
+            <label for="typeSelect"> 类型
                 <select name="typeSelect" id="typeSelect">
                     <option value="">所有</option>
                     <option value="TV">TV</option>
@@ -27,6 +70,19 @@
                     <option value="OVA">OVA</option>
                 </select>
             </label>
+
+            <label for="statusSelect"> 状态
+                <select name="statusSelect" id="statusSelect">
+                    <option value="">所有</option>
+                    <option value="Watching">Watching</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Dropped">Dropped</option>
+                    <option value="On Hold">On Hold</option>
+                </select>
+            </label>
+
+            
         </main>
         <footer>
             <button type="submit">Confirm</button>
@@ -96,12 +152,21 @@
     function filterRows(){
         const rows = document.querySelectorAll("#table tbody tr");
         const aimtype = document.getElementById('typeSelect').value;
+        const aimstatus = document.getElementById('statusSelect').value;
+        const aimyear = document.getElementById('yearSelect').value;
         rows.forEach(row =>{
             const name = row.cells[0].innerText.toLowerCase();
+            const date = row.cells[1].innerText;          // 格式 MM-DD-YYYY，可能为空
             const type = row.cells[2].innerText;
+            const status = row.cells[3].innerText;
+
+            const year = date ? date.split('-')[2] : "";  
+
             const matchSearch = name.includes(astext.toLowerCase());
             const matchType = type === aimtype || aimtype === "";
-            row.style.display = (matchSearch && matchType) ? "" : "none";
+            const matchStatus = status === aimstatus || aimstatus === "";
+            const matchYears = year === aimyear || aimyear === "";
+            row.style.display = (matchSearch && matchType && matchStatus && matchYears) ? "" : "none";
         })
     }
 
@@ -111,7 +176,7 @@
         filterRows();
     }
 
-    // 类型筛选：统一筛选后关闭弹窗
+    // 筛选接收
     function applyFilter(event) {
         event.preventDefault();
         filterRows();
