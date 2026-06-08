@@ -3,34 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
     <title>Anime List</title>
 </head>
 <body>
-    <h1>Anime List</h1>
-    <input type="text" placeholder="请输入名称" id="anime_search">
-    <table id="table">
-        <thead>
-            <tr>
-                <th onclick="sortTable(0)">名称</th>
-                <th onclick="sortTable(1)">放映日期</th>
-                <th onclick="sortTable(2)">类型</th>
-                <th onclick="sortTable(3)">状态</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for anime in animes %}
-            <tr id="animetr">
-                <td><a href="{{url_for('anime.anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a></td>
-                <td>{{ anime.broadcast_date.strftime('%m-%d-%Y') if anime.broadcast_date else "" }}</td>
-                <td>{{ anime.type.value}}</td>
-                <td>{{ anime.status.value }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <hr>
-    <a href="{{url_for('anime.anime_new')}}">Add New Anime</a>
-    <a href="{{url_for('settings')}}">Settings</a>
+    <header>
+        <h1>Anime List</h1>
+    </header>
+    <main>
+        <input type="text" placeholder="请输入名称" id="anime_search">
+        <table id="table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">名称</th>
+                    <th onclick="sortTable(1)">放映日期</th>
+                    <th onclick="sortTable(2)">类型</th>
+                    <th onclick="sortTable(3)">状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for anime in animes %}
+                <tr id="animetr">
+                    <td><a href="{{url_for('anime.anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a></td>
+                    <td>{{ anime.broadcast_date.strftime('%m-%d-%Y') if anime.broadcast_date else "" }}</td>
+                    <td>{{ anime.type.value}}</td>
+                    <td>{{ anime.status.value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <nav>
+            <ul>
+                <li><a href="{{url_for('anime.anime_new')}}">Add New Anime</a></li>
+            </ul>
+            <ul>
+                <li><a href="{{url_for('settings')}}">Settings</a></li>
+            </ul>
+        </nav>
+    </footer>
+
 
 
     <script>
