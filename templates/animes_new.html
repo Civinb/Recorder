@@ -107,7 +107,7 @@
         lastQ = q;
         status.textContent = '搜索中...';
         try {
-            const r = await fetch('/animes/api/bangumi/search?q=' + encodeURIComponent(q));
+            const r = await fetch('/api/bangumi/search?q=' + encodeURIComponent(q));
             const data = await r.json();
             if (!data.ok) {
                 status.textContent = '错误: ' + (data.error || '未知');
@@ -153,7 +153,7 @@
         status.textContent = '加载详情...';
         suggest.hidden = true;
         try {
-            const r = await fetch('/animes/api/bangumi/subject/' + id);
+            const r = await fetch('/api/bangumi/subject/' + id);
             const data = await r.json();
             if (!data.ok) throw new Error(data.error);
             fillForm(data.subject);

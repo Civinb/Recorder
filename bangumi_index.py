@@ -11,8 +11,8 @@ import sqlite3
 import zipfile
 from pathlib import Path
 
-BANGUMI_DATA_DIR = Path(__file__).parent / "static" / "bangumi_data"
-INDEX_DB_PATH = Path(__file__).parent / "instance" / "bangumi_index.db"
+BANGUMI_DATA_DIR = Path(__file__).parent / "static" / "bangumi_data"                        #.zip地址
+INDEX_DB_PATH = Path(__file__).parent / "instance" / "bangumi_index.db"                     #本地bangumi数据库地址
 
 # Bangumi subject type: 1=书 2=动画 3=音乐 4=游戏 6=三次元
 SUBJECT_TYPE_ANIME = 2
@@ -35,7 +35,7 @@ def _latest_zip() -> Path | None:
     return zips[-1] if zips else None
 
 
-def _ensure_dirs() -> None:
+def _ensure_dirs() -> None:                                             #创建数据库文件夹
     INDEX_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
@@ -72,7 +72,7 @@ def build_index(progress_cb=None) -> dict:
         INDEX_DB_PATH.unlink()
 
     conn = sqlite3.connect(INDEX_DB_PATH)
-    conn.executescript(
+    conn.executescript(                                     #建立模板
         """
         CREATE TABLE subject (
             id          INTEGER PRIMARY KEY,
@@ -105,8 +105,8 @@ def build_index(progress_cb=None) -> dict:
 
         with zf.open(info) as f:
             cur = conn.cursor()
-            batch = []
-            fts_batch = []
+            batch = []          #主表暂存
+            fts_batch = []      #fts搜索表暂存
             bytes_read = 0
             for line in f:
                 bytes_read += len(line)
@@ -146,6 +146,8 @@ def build_index(progress_cb=None) -> dict:
                     )
                 )
                 count += 1
+                
+                #存入.db
                 if len(batch) >= 2000:
                     cur.executemany(
                         "INSERT INTO subject VALUES (?,?,?,?,?,?,?,?,?,?,?)",
@@ -179,7 +181,7 @@ def build_index(progress_cb=None) -> dict:
         "db_path": str(INDEX_DB_PATH),
     }
 
-
+#尝试链接数据库
 def _connect():
     if not INDEX_DB_PATH.exists():
         raise FileNotFoundError("Bangumi 索引尚未建立，请先在设置页点击 Extract")
@@ -196,7 +198,7 @@ def _fts_query(q: str) -> str:
     return " ".join(f'"{t}"*' for t in tokens)
 
 
-def search(q: str, limit: int = 20) -> list[dict]:
+def search(q: str, limit: int = 20) -> list[dict]:                          #搜索匹配的项
     q = (q or "").strip()
     if not q:
         return []
@@ -221,7 +223,7 @@ def search(q: str, limit: int = 20) -> list[dict]:
         conn.close()
 
 
-def get_subject(subject_id: int) -> dict | None:
+def get_subject(subject_id: int) -> dict | None:                            #输入项目id，输出该id数据
     conn = _connect()
     try:
         row = conn.execute(
@@ -238,7 +240,7 @@ def get_subject(subject_id: int) -> dict | None:
         conn.close()
 
 
-def index_info() -> dict:
+def index_info() -> dict:                                               
     """返回当前索引状态"""
     if not INDEX_DB_PATH.exists():
         return {"exists": False}

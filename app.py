@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from werkzeug.utils import secure_filename
 from pathlib import Path
 from db import db
 from anime import _migrate_add_bangumi_id, anime_bp
+from bangumi_api import bangumi_bp
 
 
 app = Flask(__name__)                                          
@@ -17,15 +17,16 @@ with app.app_context():
     _migrate_add_bangumi_id()
 
 
-app.register_blueprint(anime_bp)
+app.register_blueprint(anime_bp)                                   #引入blueprint
+app.register_blueprint(bangumi_bp)
 
 
-@app.route("/home")
+@app.route("/home")                                                 #主页面
 def home():
     return render_template("home.html")
 
 
-@app.route("/settings")
+@app.route("/settings")                                             #设置页面
 def settings():
     return render_template("settings.html")
 

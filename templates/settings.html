@@ -61,7 +61,7 @@
 
     async function refreshIndexInfo() {
         try {
-            const r = await fetch("/animes/api/bangumi/index/info");
+            const r = await fetch("/api/bangumi/index/info");
             const data = await r.json();
             if (data.exists) {
                 indexInfoEl.textContent = `当前索引: ${data.count} 条动画 (来源: ${data.source || '?'})`;
@@ -80,7 +80,7 @@
         extractBtn.textContent = "Extracting...";
         extractInfo.textContent = "处理中，请勿关闭页面...";
         try {
-            const r = await fetch("/animes/api/bangumi/index/build", { method: "POST" });
+            const r = await fetch("/api/bangumi/index/build", { method: "POST" });
             const data = await r.json();
             if (!data.ok) throw new Error(data.error || "未知错误");
             extractInfo.textContent = `完成: 共提取 ${data.count} 条动画 (来源 ${data.source})`;

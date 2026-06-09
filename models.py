@@ -1,3 +1,6 @@
+'''用于存放数据库表格等'''
+
+
 import enum
 
 from db import db

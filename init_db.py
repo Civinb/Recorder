@@ -1,3 +1,5 @@
+'''初始化数据库'''
+
 from app import app, db
 
 with app.app_context():

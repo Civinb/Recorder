@@ -1,35 +1,19 @@
-from flask import Blueprint, request, redirect, render_template, url_for, jsonify
-import requests
-from flask_sqlalchemy import SQLAlchemy
+from flask import Blueprint, request, redirect, render_template, url_for
 from pathlib import Path
 import uuid
 from models import Anime
 from db import db
 from datetime import datetime
-import bangumi_index
+from bangumi_api import _download_bangumi_cover
 
 
 anime_bp = Blueprint('anime', __name__, url_prefix="/animes")
 ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}  #允许上传的图片文件扩展名集合，包含了常见的图片格式，如JPG、JPEG、PNG、GIF和WEBP等。
-BANGUMI_API_BASE = "https://api.bgm.tv/v0"
-BANGUMI_UA = "Recorder/0.1 (https://github.com/Civinb/Recorder.git)"  # bgm API 要求设置 UA
 
 
 
 
-
-def _migrate_add_bangumi_id():
-    """对已存在的 anime 表补 bangumi_id 列（轻量迁移）"""
-    with db.engine.connect() as conn:
-        cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(anime)").fetchall()]
-        if cols and "bangumi_id" not in cols:
-            conn.exec_driver_sql("ALTER TABLE anime ADD COLUMN bangumi_id INTEGER")
-            conn.commit()
-
-
-
-
-@anime_bp.route("/list")                                   
+@anime_bp.route("/list")                                         #animeslist页面
 def animes():
     animes = Anime.query.all()
     return render_template("animes_list.html", animes=animes)
@@ -79,44 +63,7 @@ def anime_new():
     return render_template('animes_new.html')
 
 
-def _download_bangumi_cover(subject_id: int) -> str | None:
-    """调 Bangumi API 拿封面 URL 并下载到 static/uploads/，返回文件名"""
-    try:
-        r = requests.get(
-            f"{BANGUMI_API_BASE}/subjects/{subject_id}",
-            headers={"User-Agent": BANGUMI_UA},
-            timeout=10,
-        )
-        if r.status_code != 200:
-            return None
-        data = r.json()
-        img_url = (data.get("images") or {}).get("large")
-        if not img_url:
-            return None
-        img_resp = requests.get(img_url, headers={"User-Agent": BANGUMI_UA}, timeout=15)
-        if img_resp.status_code != 200:
-            return None
-        ext = Path(img_url).suffix.lower() or ".jpg"
-        if ext not in ALLOWED_EXTENSIONS:
-            ext = ".jpg"
-        upload_dir = Path(anime_bp.root_path) / "static" / "uploads"
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = f"{uuid.uuid4().hex}{ext}"
-        (upload_dir / safe_name).write_bytes(img_resp.content)
-        return safe_name
-    except Exception as e:
-        anime_bp.logger.warning(f"下载 bangumi 封面失败 (id={subject_id}): {e}")
-        return None
 
-
-
-
-
-# ---------------- Bangumi 索引相关 API ----------------
-
-
-
-# ------------------------------------------------------------
 
 @anime_bp.route("/<int:anime_id>")                                 #处理/animes/<anime_id>路径的GET请求，用于显示指定ID的动漫详情页面。
 def anime_detail(anime_id):
@@ -124,7 +71,8 @@ def anime_detail(anime_id):
     return render_template("animes_detail.html", anime=anime)
 
 
-@anime_bp.route("/<int:anime_id>/edit", methods=["GET", "POST"])
+
+@anime_bp.route("/<int:anime_id>/edit", methods=["GET", "POST"])                                 #单个anime条目编辑
 def anime_edit(anime_id):
     anime = Anime.query.get_or_404(anime_id)
     if request.method == "POST":
@@ -162,7 +110,9 @@ def anime_edit(anime_id):
 
     return render_template("animes_edit.html", anime=anime)
 
-@anime_bp.route("/<int:anime_id>/delete", methods=["POST"])
+
+
+@anime_bp.route("/<int:anime_id>/delete", methods=["POST"])                             #条目删除
 def anime_delete(anime_id):
     anime = Anime.query.get_or_404(anime_id)
     if anime.image_url:
@@ -172,12 +122,3 @@ def anime_delete(anime_id):
     db.session.delete(anime)
     db.session.commit()
     return redirect(url_for('anime.animes'))
-
-@anime_bp.route("/list/search")
-def anime_search():
-    q = request.args.get("q", "")
-    try:
-        results = bangumi_index.search(q, limit=15)
-        return jsonify({"ok": True, "results": results})
-    except FileNotFoundError as e:
-        return jsonify({"ok": False, "error": str(e)}), 400
