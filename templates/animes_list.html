@@ -13,7 +13,9 @@
 
 
 <button id="filterBT" onclick="document.getElementById('filterTable').showModal()">Sort</button>
-
+<a href="" id="10">10</a>
+<a href="" id="25">25</a>
+<a href="" id="50">50</a>
 
 <dialog id="filterTable">
     <header>
@@ -136,7 +138,7 @@
     //分页
     let pagerows = [];
     let currentPage = 1;
-    let pageSize = 5;
+    let pageSize = 10;
     function pageAction(){
         pagerows.forEach(row =>{
             row.style.display = "none";
@@ -162,8 +164,28 @@
     }
     const pre_bt = document.getElementById("pre_bt");
     const next_bt = document.getElementById("next_bt");
+    const size10 = document.getElementById("10");
+    const size25 = document.getElementById("25");
+    const size50 = document.getElementById("50");
     pre_bt.addEventListener("click", prepage);
     next_bt.addEventListener("click", addpage);
+    size10.addEventListener("click", function(e){
+        changePageSize(10);
+    })
+    
+    size25.addEventListener("click", function(e){
+        changePageSize(25);
+    })
+    
+    size50.addEventListener("click", function(e){
+        changePageSize(50);
+    })
+
+
+    function changePageSize(size){
+        pageSize = size;
+        pageAction();
+    }
 
 
 
