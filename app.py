@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from pathlib import Path
 from db import db
-from anime import _migrate_add_bangumi_id, anime_bp
-from bangumi_api import bangumi_bp
+from anime import anime_bp
+from bangumi_api import bangumi_bp, _migrate_add_bangumi_id
 
 
 app = Flask(__name__)                                          

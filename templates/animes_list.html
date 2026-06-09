@@ -8,7 +8,8 @@
 {% endblock %}
 
 {% block content %}
-<input type="text" placeholder="请输入名称" id="anime_search">
+
+<input type="text" placeholder="请输入名称" id="anime_search"> 
 
 
 <button id="filterBT" onclick="document.getElementById('filterTable').showModal()">Sort</button>
@@ -112,6 +113,8 @@
         {% endfor %}
     </tbody>
 </table>
+<button id="pre_bt">上一页</button>
+<button id="next_bt">下一页</button>
 
 <script>
     // 状态变量
@@ -129,6 +132,43 @@
             timer = setTimeout(() => fn(...args), ms);
         };
     }
+    
+    //分页
+    let pagerows = [];
+    let currentPage = 1;
+    let pageSize = 5;
+    function pageAction(){
+        pagerows.forEach(row =>{
+            row.style.display = "none";
+        })
+        const current = pagerows.slice((currentPage-1)*pageSize, currentPage*pageSize);
+        current.forEach(row2=>{
+            row2.style.display = "";
+        })
+    }
+
+    function addpage(){
+        if(currentPage != Math.ceil(pagerows.length/pageSize)){
+            currentPage++;
+        }
+        pageAction(); 
+    }
+
+    function prepage(){
+        if(currentPage != 1){
+            currentPage--;
+        }
+        pageAction();
+    }
+    const pre_bt = document.getElementById("pre_bt");
+    const next_bt = document.getElementById("next_bt");
+    pre_bt.addEventListener("click", prepage);
+    next_bt.addEventListener("click", addpage);
+
+
+
+
+
 
     // 排序
     function sortTable(index){
@@ -147,13 +187,14 @@
         od = !od;
         rows.forEach(row => tbody.appendChild(row));
     }
-
+    
     // 筛选引擎：搜索词 + 类型，两个条件都满足才显示
     function filterRows(){
         const rows = document.querySelectorAll("#table tbody tr");
         const aimtype = document.getElementById('typeSelect').value;
         const aimstatus = document.getElementById('statusSelect').value;
         const aimyear = document.getElementById('yearSelect').value;
+        let displayedrow = [];
         rows.forEach(row =>{
             const name = row.cells[0].innerText.toLowerCase();
             const date = row.cells[1].innerText;          // 格式 MM-DD-YYYY，可能为空
@@ -166,8 +207,20 @@
             const matchType = type === aimtype || aimtype === "";
             const matchStatus = status === aimstatus || aimstatus === "";
             const matchYears = year === aimyear || aimyear === "";
-            row.style.display = (matchSearch && matchType && matchStatus && matchYears) ? "" : "none";
+            // row.style.display = (matchSearch && matchType && matchStatus && matchYears) ? "" : "none";
+            if (matchSearch && matchType && matchStatus && matchYears){
+                displayedrow.push(row);
+            }
         })
+        rows.forEach(row =>{
+            row.style.display = "none";
+        })
+        // displayedrow.forEach(row1 =>{
+        //     row1.style.display = "";
+        // })
+        pagerows = displayedrow;
+        currentPage = 1;
+        pageAction();
     }
 
     // 搜索：更新搜索词后统一筛选
@@ -191,6 +244,7 @@
         debounced(value);
     })
 
+    filterRows();
 
 </script>
 {% endblock %}
