@@ -139,7 +139,7 @@
     let pagerows = [];
     let currentPage = 1;
     let pageSize = 10;
-    function pageAction(){
+    function pageAction(){                                                              //控制页面条目显示
         pagerows.forEach(row =>{
             row.style.display = "none";
         })
@@ -149,7 +149,8 @@
         })
     }
 
-    function addpage(){
+    //向后或向前翻页
+    function addpage(){                                             
         if(currentPage != Math.ceil(pagerows.length/pageSize)){
             currentPage++;
         }
@@ -162,6 +163,7 @@
         }
         pageAction();
     }
+
     const pre_bt = document.getElementById("pre_bt");
     const next_bt = document.getElementById("next_bt");
     const size10 = document.getElementById("10");
@@ -170,14 +172,17 @@
     pre_bt.addEventListener("click", prepage);
     next_bt.addEventListener("click", addpage);
     size10.addEventListener("click", function(e){
+        e.preventDefault();
         changePageSize(10);
     })
     
     size25.addEventListener("click", function(e){
+        e.preventDefault();
         changePageSize(25);
     })
     
     size50.addEventListener("click", function(e){
+        e.preventDefault();
         changePageSize(50);
     })
 
@@ -186,10 +191,6 @@
         pageSize = size;
         pageAction();
     }
-
-
-
-
 
 
     // 排序
