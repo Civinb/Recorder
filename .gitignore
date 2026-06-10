@@ -1,4 +1,5 @@
 __pycache__/
 *.pyc
 instance/
-static/
+static/bangumi_data/
+static/uploads/

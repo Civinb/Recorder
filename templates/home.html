@@ -3,7 +3,7 @@
 {% block title %}Home{% endblock %}
 
 {% block header %}
-<h1>Civinb's Archieve</h1>
+{{ super() }}
 {% endblock %}
 
 {% block content %}
@@ -13,9 +13,5 @@
 {% endblock %}
 
 {% block footer %}
-<nav>
-    <ul>
-        <li><a href="{{url_for('settings')}}">Setting</a></li>
-    </ul>
-</nav>
+
 {% endblock %}

@@ -4,7 +4,9 @@
 
 {% block header %}
 {{ super() }}
-<h1>Anime List</h1>
+<header style="text-align: center;">
+    <h1>Anime List</h1>
+</header>
 {% endblock %}
 
 {% block content %}
@@ -12,10 +14,14 @@
 <input type="text" placeholder="请输入名称" id="anime_search"> 
 
 
-<button id="filterBT" onclick="document.getElementById('filterTable').showModal()">Sort</button>
-<a href="" id="10">10</a>
-<a href="" id="25">25</a>
-<a href="" id="50">50</a>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; gap: 12px;">
+        <a href="" id="10">10</a>
+        <a href="" id="25">25</a>
+        <a href="" id="50">50</a>
+    </div>
+    <button id="filterBT" onclick="document.getElementById('filterTable').showModal()">Sort</button>
+</div>
 
 <dialog id="filterTable">
     <header>
@@ -87,10 +93,10 @@
 
             
         </main>
-        <footer>
-            <button type="submit">Confirm</button>
-            <button onclick="document.getElementById('filterTable').close()">Back</button>
-        </footer>
+            <div style="display: flex; gap: 50px;">
+                <button onclick="document.getElementById('filterTable').close()">Back</button>
+                <button type="submit">Confirm</button> 
+            </div>
     </form>
 </dialog>
 
@@ -115,8 +121,11 @@
         {% endfor %}
     </tbody>
 </table>
-<button id="pre_bt">上一页</button>
-<button id="next_bt">下一页</button>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <button id="pre_bt">上一页</button>
+    <button id="next_bt">下一页</button>
+</div>
+
 
 <script>
     // 状态变量
@@ -276,9 +285,6 @@
 <nav>
     <ul>
         <li><a href="{{url_for('anime.anime_new')}}">Add New Anime</a></li>
-    </ul>
-    <ul>
-        <li><a href="{{url_for('settings')}}">Settings</a></li>
     </ul>
 </nav>
 {% endblock %}

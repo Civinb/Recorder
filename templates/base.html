@@ -11,9 +11,14 @@
 <body>
     <header class="container">
         {% block header %}
-        <nav>
-            <a href="{{url_for('home')}}">Home</a>
-        </nav>
+            <div style="display: flex; align-items: center; gap: 50px;">
+                <img src="{{ url_for('static', filename='icon/CVBRecorder_full.png') }}" alt="" width="150">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                    <a href="{{url_for('home')}}">Home</a>
+                    <a href="{{url_for('settings')}}">Setting</a></li>
+                </div>
+            </div>
+        <br>
         {% endblock %}
     </header>
     <main class="container">
