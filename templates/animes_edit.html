@@ -17,7 +17,11 @@
     <p>
         <label>Current Image: </label>
         {%if anime.image_url %}
-            <img src="{{ url_for('static', filename='uploads/' + anime.image_url) }}" alt="Loading failed" width="200">
+            {% if anime.image_url.startswith('http') %}
+                <img src="{{ anime.image_url }}" alt="Loading failed" width="200">
+            {% else %}
+                <img src="{{ url_for('static', filename='uploads/' + anime.image_url) }}" alt="Loading failed" width="200">
+            {% endif %}
         {% else %}
             No image uploaded.
         {% endif %}

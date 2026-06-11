@@ -10,7 +10,7 @@
 {% block content %}
 {% if anime.image_url%}
     {% if anime.image_url.startswith('http') %}
-        <img src="anime.image_url" alt="Loading failed" width="300">
+        <img src="{{ anime.image_url }}" alt="Loading failed" width="300">
     {% else %}
         <img src="{{url_for('static', filename='uploads/' + anime.image_url)}}"
             alt="Loading failed" width="300">
