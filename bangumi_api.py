@@ -4,6 +4,7 @@ from pathlib import Path
 import bangumi_index
 import uuid
 from db import db
+from sqlalchemy import inspect
 
 
 BANGUMI_API_BASE = "https://api.bgm.tv/v0"
@@ -79,11 +80,13 @@ def _download_bangumi_cover(subject_id: int) -> str | None:
         return None
     
 
-
-    
 def _migrate_add_bangumi_id():
-    with db.engine.connect() as conn:
-        cols = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(anime)").fetchall()]
-        if cols and "bangumi_id" not in cols:
+    # 用 SQLAlchemy 的 inspector 检查列，SQLite 和 PostgreSQL 都适用。
+    inspector = inspect(db.engine)
+    if "anime" not in inspector.get_table_names():
+        return
+    cols = [c["name"] for c in inspector.get_columns("anime")]
+    if "bangumi_id" not in cols:
+        with db.engine.connect() as conn:
             conn.exec_driver_sql("ALTER TABLE anime ADD COLUMN bangumi_id INTEGER")
             conn.commit()
