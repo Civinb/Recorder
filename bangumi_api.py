@@ -61,20 +61,7 @@ def _download_bangumi_cover(subject_id: int) -> str | None:
         if r.status_code != 200:
             return None
         data = r.json()
-        img_url = (data.get("images") or {}).get("large")
-        if not img_url:
-            return None
-        img_resp = requests.get(img_url, headers={"User-Agent": BANGUMI_UA}, timeout=15)
-        if img_resp.status_code != 200:
-            return None
-        ext = Path(img_url).suffix.lower() or ".jpg"
-        if ext not in ALLOWED_EXTENSIONS:
-            ext = ".jpg"
-        upload_dir = Path(bangumi_bp.root_path) / "static" / "uploads"
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        safe_name = f"{uuid.uuid4().hex}{ext}"
-        (upload_dir / safe_name).write_bytes(img_resp.content)
-        return safe_name
+        return (data.get("images") or {}).get("large")
     except Exception as e:
         current_app.logger.warning(f"下载 bangumi 封面失败 (id={subject_id}): {e}")
         return None

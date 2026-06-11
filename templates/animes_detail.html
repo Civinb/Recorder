@@ -9,8 +9,12 @@
 
 {% block content %}
 {% if anime.image_url%}
-    <img src="{{url_for('static', filename='uploads/' + anime.image_url)}}"
-        alt="Loading failed" width="300">
+    {% if anime.image_url.startswith('http') %}
+        <img src="anime.image_url" alt="Loading failed" width="300">
+    {% else %}
+        <img src="{{url_for('static', filename='uploads/' + anime.image_url)}}"
+            alt="Loading failed" width="300">
+    {% endif %}
 {% endif %}
 <p><strong>Type: </strong>{{ anime.type.value }}</p>
 <p><strong>Boardcast date: </strong>{{ anime.broadcast_date.strftime('%Y-%m-%d') if anime.broadcast_date else 'Unknown' }}</p>
