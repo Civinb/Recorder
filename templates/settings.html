@@ -8,17 +8,36 @@
 {% endblock %}
 
 {% block content %}
-<section>
+<div>
+    <h3>以下设置只在本地部署时可用</h3>
+</div>
+
+<div>
+    <h5>背景图片设置</h5>
+    <form action="" method = "post" style="display: flex; align-items: center; gap: 2px;" enctype="multipart/form-data">
+        <input type="file" name="bg_pic" accept="image/*" style="width: auto;">
+        <button type="submit" 
+            style="width: 80px; height: 30px; font-size: 16px; display: flex; align-items: center; justify-content: center;">上传</button>
+    </form>
+    
+    <div>
+        {% for img in images %}
+            <a href="{{ url_for('choose_bg', bg_name = img) }}"><img src="{{ url_for('static', filename='background_pic/' + img) }}" width = "150"></a>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<div>
+    <h5>同步bangumi最新数据</h5>
     <label for="sync-bangumi">Sync Latest Bangumi Data</label>
     <button id="sync-bangumi">Sync</button>
     <div id="sync-info"></div>
     <p>下载完成后请把 zip 放到 <code>static/bangumi_data/</code> 目录</p>
-</section>
+</div>
 
-<hr>
 
 <section>
-    <h2>Bangumi 索引</h2>
+    <h5>Bangumi 索引</h5>
     <div id="index-info">检查中...</div>
     <button id="extract-bangumi">Extract / Rebuild Index</button>
     <div id="extract-info"></div>
@@ -37,7 +56,8 @@
             const res = await fetch(META_URL);
             if (!res.ok) throw new Error("Failed to fetch data");
             const meta = await res.json();
-            info.textContent = `Latest data updated at: ${meta.updated_at}, downloading...`;
+ 
+           info.textContent = `Latest data updated at: ${meta.updated_at}, downloading...`;
             const link = document.createElement("a");
             link.href = meta.browser_download_url;
             link.download = "meta.name";

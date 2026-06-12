@@ -3,4 +3,5 @@ __pycache__/
 instance/
 static/bangumi_data/
 static/uploads/
+current_bg.txt
 部署到Render教程.md
