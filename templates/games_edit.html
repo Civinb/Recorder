@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Game{% endblock %}
+
+{% block header %}
+{{ super() }}
+<h1>Edit</h1>
+{% endblock %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">
+    <p>
+        <label>Name: </label>
+        <input type="text" placeholder="e.g. Trails in the Sky" value="{{game.name}}" name="name">
+    </p>
+
+    <p>
+        <label>Current Image: </label>
+        {%if game.image_url %}
+            {% if game.image_url.startswith('http') %}
+                <img src="{{ game.image_url }}" alt="Loading failed" width="200">
+            {% else %}
+                <img src="{{ url_for('static', filename='uploads/gamePic' + game.image_url) }}" alt="Loading failed" width="200">
+            {% endif %}
+        {% else %}
+            No image uploaded.
+        {% endif %}
+    </p>
+
+    <p>
+        <label>Change Image: </label>
+        <input type="file" name="image_file" accept="image/*">
+    </p>
+
+    <p>
+        <label>Summary: </label>
+        <textarea name="summary" id="summary" cols="30" rows="5">{{game.summary}}</textarea>
+    </p>
+
+    <p>
+        <label>Your review: </label>
+        <textarea name="reviews" id="reviews" cols="30" rows="5">{{game.reviews}}</textarea>
+    </p>
+
+    <p>
+        <label>Your Score: </label>
+        <input type="number" name="score" min="0" max="10" step="0.1" value="{{game.score if game.score is not none else '7.0'}}">
+    </p>
+
+    <p>
+        <label>Type: </label>
+        <select name="type">
+            <option value="PC" {% if game.type == 'PC' %}selected{% endif %}>PC</option>
+            <option value="CONSOLE" {% if game.type == 'CONSOLE' %}selected{% endif %}>Console</option>
+            <option value="MOBILE" {% if game.type == 'MOBILE' %}selected{% endif %}>Mobile</option>
+            <option value="ONLINE" {% if game.type == 'ONLINE' %}selected{% endif %}>Online</option>
+        </select>
+    </p>
+
+    <p>
+        <label>Broadcast date: </label>
+        <input type="date" name="broadcast_date" value="{{ game.broadcast_date.strftime('%Y-%m-%d') if game.broadcast_date else '' }}">
+    </p>
+
+    <p>
+        <label>igdb link: </label>
+        <input type="text" placeholder="e.g. https://chii.in/subject/10380" value="{{game.igdb_links}}" name="igdb_links">
+    </p>
+
+    <p>
+        <label>Official link: </label>
+        <input type="text" placeholder="e.g. https://steinsgate.jp/" value="{{game.official_links}}" name="official_links">
+    </p>
+
+    <p>
+        <label>Status: </label>
+        <select name="status" >
+            <option value="PLAYING" {% if game.status == 'PLAYING' %}selected{% endif %}>Playing</option>
+            <option value="COMPLETED" {% if game.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+            <option value="PLANNING" {% if game.status == 'PLANNING' %}selected{% endif %}>Planning</option>
+            <option value="DROPPED" {% if game.status == 'DROPPED' %}selected{% endif %}>Dropped</option>
+            <option value="ON_HOLD" {% if game.status == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
+        </select>
+    </p>
+
+    <hr>
+    <button type="submit">Submit</button> <a href="{{url_for('game.game_detail', game_id=game.id)}}">Cancel</a>
+</form>
+{% endblock %}

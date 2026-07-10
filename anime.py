@@ -1,9 +1,11 @@
 from flask import Blueprint, request, redirect, render_template, url_for
 from pathlib import Path
 import uuid
+from datetime import datetime
+
+
 from models import Anime
 from db import db
-from datetime import datetime
 from bangumi_api import _download_bangumi_cover
 
 

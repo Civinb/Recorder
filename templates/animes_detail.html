@@ -12,27 +12,27 @@
     {% if anime.image_url.startswith('http') %}
         <img src="{{ anime.image_url }}" alt="Loading failed" width="300">
     {% else %}
-        <img src="{{url_for('static', filename='uploads/' + anime.image_url)}}"
+        <img src="{{url_for('static', filename='uploads/animePic/' + anime.image_url)}}"
             alt="Loading failed" width="300">
     {% endif %}
 {% endif %}
-<p><strong>Type: </strong>{{ anime.type.value }}</p>
-<p><strong>Boardcast date: </strong>{{ anime.broadcast_date.strftime('%Y-%m-%d') if anime.broadcast_date else 'Unknown' }}</p>
-<p><strong>Summary: </strong>{{ anime.summary }}</p>
-<p><strong>Score: </strong>{{ anime.score }} / 10</p>
-<p><strong>Reviews: </strong>{{ anime.reviews }}</p>
-<strong>Links</strong>
+    <p><strong>Type: </strong>{{ anime.type.value }}</p>
+    <p><strong>Boardcast date: </strong>{{ anime.broadcast_date.strftime('%Y-%m-%d') if anime.broadcast_date else 'Unknown' }}</p>
+    <p><strong>Summary: </strong>{{ anime.summary }}</p>
+    <p><strong>Score: </strong>{{ anime.score }} / 10</p>
+    <p><strong>Reviews: </strong>{{ anime.reviews }}</p>
+    <strong>Links</strong>
 {% if anime.bangumi_links %}
     <p><a href="{{ anime.bangumi_links }}" target="_blank">Bangumi</a></p>
 {% endif %}
 {% if anime.official_links %}
     <p><a href="{{ anime.official_links }}" target="_blank">Official Site</a></p>
 {% endif %}
-<p><strong>Status: </strong>{{ anime.status.value if anime.status else 'Unknown' }}</p>
+    <p><strong>Status: </strong>{{ anime.status.value if anime.status else 'Unknown' }}</p>
 {% endblock %}
 
 {% block footer %}
-<div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; align-items: center; gap: 15px;">
         <a href="{{url_for('anime.animes')}}">Back to List</a>
         <a href="{{url_for('anime.anime_edit', anime_id=anime.id)}}">Edit</a>

@@ -64,6 +64,6 @@ class Game(db.Model):
     score = db.Column(db.Float, nullable=True)
     reviews = db.Column(db.Text, nullable=True)
     tags = db.Column(db.String(200), nullable=True)
-    IGDB_links = db.Column(db.String(200), nullable=True)
+    igdb_links = db.Column(db.String(200), nullable=True)
     official_links = db.Column(db.String(200), nullable=True)
     status = db.Column(db.Enum(gameStatus), nullable=False)
