@@ -2,13 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from pathlib import Path
-from db import db
-from anime import anime_bp, ALLOWED_EXTENSIONS
-from bangumi_api import bangumi_bp, _migrate_add_bangumi_id
 import os
 from sqlalchemy import text
-from bangumi_index import INDEX_DB_PATH
 import uuid
+
+from db import db
+from anime import anime_bp, ALLOWED_EXTENSIONS
+from game import game_bp
+from bangumi_api import bangumi_bp, _migrate_add_bangumi_id
+from bangumi_index import INDEX_DB_PATH
+
 
 app = Flask(__name__)  
 db_url = os.environ.get("DATABASE_URL", "sqlite:///main.db")
@@ -16,6 +19,8 @@ if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)                                      
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url      #配置Flask应用程序使用SQLite数据库，并指定数据库文件为main.db。
 db.init_app(app)
+
+
 bgpic_dir = Path("static/background_pic")
 CURRENT_BG_FILE = Path("current_bg.txt")          # 记录当前选中的背景文件名
 DEFAULT_BG = "6aca374e0b6f4305a15ed59cecf1ae70.jpg"
@@ -59,8 +64,11 @@ with app.app_context():
     _migrate_add_bangumi_id()
     _restore_index_from_db()
 
+
 app.register_blueprint(anime_bp)                                   #引入blueprint
 app.register_blueprint(bangumi_bp)
+app.register_blueprint(game_bp)
+
 
 def list_bgpic():
     if not bgpic_dir.exists():

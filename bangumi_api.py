@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, current_app
 import requests
 from pathlib import Path
 import bangumi_index
-import uuid
 from db import db
 from sqlalchemy import inspect
 
