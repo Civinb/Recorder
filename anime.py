@@ -42,7 +42,7 @@ def anime_new():
         if image_file and image_file.filename:
             ext = Path(image_file.filename).suffix.lower()
             if ext in ALLOWED_EXTENSIONS:
-                upload_dir = Path("static/uploads")
+                upload_dir = Path("static/uploads/animePic")
                 upload_dir.mkdir(parents=True, exist_ok=True)
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 image_file.save(upload_dir / safe_name)
@@ -91,7 +91,7 @@ def anime_edit(anime_id):
         if image_file and image_file.filename:
             ext = Path(image_file.filename).suffix.lower()
             if ext in ALLOWED_EXTENSIONS:
-                upload_dir = Path("static/uploads")
+                upload_dir = Path("static/uploads/animePic")
                 upload_dir.mkdir(parents=True, exist_ok=True)
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 image_file.save(upload_dir / safe_name)
@@ -118,7 +118,7 @@ def anime_edit(anime_id):
 def anime_delete(anime_id):
     anime = Anime.query.get_or_404(anime_id)
     if anime.image_url:
-        old_path = Path(anime_bp.root_path) / "static" / "uploads" / anime.image_url
+        old_path = Path(anime_bp.root_path) / "static" / "uploads" / "animePic" / anime.image_url
         if old_path.exists():
             old_path.unlink()
     db.session.delete(anime)

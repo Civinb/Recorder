@@ -20,7 +20,7 @@
             {% if game.image_url.startswith('http') %}
                 <img src="{{ game.image_url }}" alt="Loading failed" width="200">
             {% else %}
-                <img src="{{ url_for('static', filename='uploads/gamePic' + game.image_url) }}" alt="Loading failed" width="200">
+                <img src="{{ url_for('static', filename='uploads/gamePic/' + game.image_url) }}" alt="Loading failed" width="200">
             {% endif %}
         {% else %}
             No image uploaded.

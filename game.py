@@ -109,7 +109,7 @@ def game_edit(game_id):
 def game_delete(game_id):
     game = Game.query.get_or_404(game_id)
     if game.image_url:
-        old_path = Path(game_bp.root_path) / "static" / "uploads" / game.image_url
+        old_path = Path(game_bp.root_path) / "static" / "uploads" / "gamePic" / game.image_url
         if old_path.exists():
             old_path.unlink()
     db.session.delete(game)

@@ -3,9 +3,6 @@
 一个基于 Flask 的本地信息录入收藏和管理工具。目前仅支持动漫部分的录入，后续将加入电影，游戏等。
 动漫部分支持记录每部动漫的名称、封面、类型、放映日期、评分、评价、标签等信息，并集成 [Bangumi](https://bgm.tv/) 数据：可在本地构建全文搜索索引，按番剧自动抓取封面。
 
-在线体验：<https://cvbrecorder.onrender.com/home>（部署于 [Render](https://render.com/)）。
-### 注：在线部署仍在尝试阶段，设置中的同步bangumi数据的功能仅支持本地部署使用，在线点击只会下载最新.zip数据包，无法同步到数据库中。也暂未加入用户功能，所有数据都为通用数据，即一人修改数据所有人都可见，因此想要真正个人使用请参考本地部署，在线链接仅供预览体验。
-
 ## 功能特性
 ### 动漫记录
 - **动漫管理**：新增、编辑、删除、查看动漫条目，支持本地图片上传作为封面。
@@ -22,7 +19,7 @@
 ## 技术栈
 
 - Python 3 + [Flask](https://flask.palletsprojects.com/) 3.1
-- Flask-SQLAlchemy 3.1 / SQLAlchemy 2.0（本地 SQLite，线上 PostgreSQL via psycopg2）
+- Flask-SQLAlchemy 3.1 / SQLAlchemy 2.0（本地 SQLite）
 - sqlite3 + FTS5（Bangumi 全文搜索索引）
 - requests（调用 Bangumi API）
 

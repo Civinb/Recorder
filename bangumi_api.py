@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 import requests
 from pathlib import Path
 import bangumi_index
+import uuid
 from db import db
 from sqlalchemy import inspect
 
@@ -50,7 +51,7 @@ def bangumi_subject(subject_id):
 
 
 def _download_bangumi_cover(subject_id: int) -> str | None:
-    """调 Bangumi API 拿封面 URL 并下载到 static/uploads/，返回文件名"""
+    """调 Bangumi API 拿封面 URL 并下载到 static/uploads/animePic/，返回文件名"""
     try:
         r = requests.get(
             f"{BANGUMI_API_BASE}/subjects/{subject_id}",
@@ -60,14 +61,27 @@ def _download_bangumi_cover(subject_id: int) -> str | None:
         if r.status_code != 200:
             return None
         data = r.json()
-        return (data.get("images") or {}).get("large")
+        img_url = (data.get("images") or {}).get("large")
+        if not img_url:
+            return None
+        img_resp = requests.get(img_url, headers={"User-Agent": BANGUMI_UA}, timeout=15)
+        if img_resp.status_code != 200:
+            return None
+        ext = Path(img_url).suffix.lower() or ".jpg"
+        if ext not in ALLOWED_EXTENSIONS:
+            ext = ".jpg"
+        upload_dir = Path(bangumi_bp.root_path) / "static" / "uploads" / "animePic"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = f"{uuid.uuid4().hex}{ext}"
+        (upload_dir / safe_name).write_bytes(img_resp.content)
+        return safe_name
     except Exception as e:
         current_app.logger.warning(f"下载 bangumi 封面失败 (id={subject_id}): {e}")
         return None
     
 
 def _migrate_add_bangumi_id():
-    # 用 SQLAlchemy 的 inspector 检查列，SQLite 和 PostgreSQL 都适用。
+    # 用 SQLAlchemy 的 inspector 检查列。
     inspector = inspect(db.engine)
     if "anime" not in inspector.get_table_names():
         return
