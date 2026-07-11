@@ -202,22 +202,29 @@
     }
 
 
-    // 排序
+    function parseDate(s){
+        if (!s) return od ? Infinity : -Infinity;
+        const [m, d, y] = s.split('-').map(Number);
+        return new Date(y, m - 1, d).getTime();
+    }
+
+    
     function sortTable(index){
         const tbody = document.querySelector("#table tbody");
-        const rows = Array.from(tbody.rows);
-        rows.sort((a,b) => {
-            let x = a.cells[index].innerText;
-            let y = b.cells[index].innerText;
-            const nx = parseFloat(x);
-            const ny = parseFloat(y);
-            if (!isNaN(nx) && !isNaN(ny)){
-                return od ? nx - ny : ny - nx;
+        pagerows.sort((a,b) => {
+            let x = a.cells[index].innerText.trim();
+            let y = b.cells[index].innerText.trim();
+            if (index === 1){                                   
+                const dx = parseDate(x);
+                const dy = parseDate(y);
+                return od ? dx - dy : dy - dx;
             }
             return od ? x.localeCompare(y) : y.localeCompare(x);
         })
         od = !od;
-        rows.forEach(row => tbody.appendChild(row));
+        pagerows.forEach(row => tbody.appendChild(row));        
+        currentPage = 1;
+        pageAction();
     }
     
     // 筛选引擎：搜索词 + 类型，两个条件都满足才显示
