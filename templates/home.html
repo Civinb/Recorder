@@ -7,8 +7,11 @@
 {% endblock %}
 
 {% block content %}
-    <a href="{{url_for('anime.animes')}}">Anime</a>
-    <a href="{{url_for('game.games')}}">Game</a>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+        <a class="home_card anime" href="{{url_for('anime.animes')}}">Anime</a>
+        <a class="home_card game" href="{{url_for('game.games')}}">Game</a>
+    </div>
+    
 {% endblock %}
 
 {% block footer %}

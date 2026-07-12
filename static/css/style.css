@@ -1,6 +1,8 @@
+/* Global styles */
 body {
             position: relative;
             min-height: 100vh;
+            font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
         }
 
         body::before {
@@ -28,3 +30,108 @@ body {
             z-index: -1;
         }
 
+p {
+    color: rgb(0, 0, 0)
+}
+
+h1, h2 {
+    color: rgb(91, 150, 49)
+}
+
+h3, h4, h5, h6 {
+    color: rgb(0, 0, 0)
+}
+
+a:link, a:visited {
+    color: rgb(52, 86, 28);
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    color: rgb(75, 123, 41);
+    text-decoration: underline;
+}
+
+
+/* Table styles */
+table {
+    border: 1px solid rgb(0, 0, 0);
+    border-collapse: collapse;
+    width: 100%;
+    background-color: rgb(255, 255, 255, 0.7);
+}
+
+td {
+    border: 1px solid rgb(0, 0, 0, 0.4);
+    height: 40px;
+    padding: 5px;
+}
+
+th:hover {
+    background-color: rgba(227, 234, 87, 0.3);
+}
+
+th {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    height: 50px;
+    text-align: left;
+    padding: 5px;
+}
+
+
+/* Header link styles */
+div.header-link{
+     margin: 10px;
+}
+
+div.header-link a{
+    display: block;
+    padding: 10px 20px 10px 20px;
+}
+
+div.header-link a:hover{
+    background-color: rgba(227, 234, 87, 0.3);
+    border-radius: 15px;
+}
+
+div.header-link a:hover, div.header-link a:active{
+    color: rgb(52, 86, 28);
+    text-decoration: none;
+}
+
+
+/* Home page card styles */
+.home_card,
+.home_card:link,
+.home_card:visited,
+.home_card:hover,
+.home_card:active {
+    width: 300px;
+    height: 300px;
+    display: inline-block;
+    margin: 10px;
+    text-align: left;
+    background-size: cover;
+    background-position: center;
+    color: inherit;
+    padding: 5px;
+    padding-left: 20px;
+    font-size: 20px;
+    text-decoration: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transform: all 0.3s ease;
+}
+
+.home_card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.home_card.anime {
+    background-image: url("../default/animeCard.png");
+}
+
+.home_card.game {
+    background-image: url("../default/gameCard.png");
+}

@@ -9,8 +9,6 @@
         :root {
             --bg-image: url("{{ url_for('static', filename='background_pic/' + current_bg) }}");
         }
-
-
     </style>
     <title>
         {% block title %}
@@ -28,11 +26,19 @@
                         alt="" width="150">
                 </a>
                 
-                <div style="margin-top: 30px; margin-left: 400px; gap: 40px; display: flex;">
-                    <a href="{{url_for('home')}}">Home</a>
-                    <a href="{{url_for('anime.animes')}}">Animes</a>
-                    <a href="{{url_for('game.games')}}">Games</a>
-                    <a href="{{url_for('settings')}}">Setting</a>
+                <div style="margin-top: 30px; margin-right: 200px; display: flex; margin-left: auto;">
+                    <div class="header-link">
+                        <a href="{{url_for('home')}}">Home</a>
+                    </div>
+                    <div class="header-link">
+                        <a href="{{url_for('anime.animes')}}">Animes</a>
+                    </div>
+                    <div class="header-link">
+                        <a href="{{url_for('game.games')}}">Games</a>
+                    </div>
+                    <div class="header-link">
+                        <a href="{{url_for('settings')}}">Setting</a>
+                    </div>
                 </div>
             </div>
         <br>
