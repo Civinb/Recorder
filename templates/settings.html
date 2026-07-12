@@ -9,6 +9,9 @@
 
 {% block content %}
 <div>
+    <h3>通用设置</h3>
+</div>
+<div>
     <h5>背景图片设置</h5>
     <form action="" method = "post" style="display: flex; align-items: center; gap: 2px;" enctype="multipart/form-data">
         <input type="file" name="bg_pic" accept="image/*" style="width: auto;">
@@ -22,7 +25,8 @@
         {% endfor %}
     </div>
 </div>
-<br>
+<hr style="border: none; height: 1px; background-color: #000000;">
+<h3>Anime Settings</h3>
 <div>
     <h5>同步bangumi最新数据</h5>
     <label for="sync-bangumi">Sync Latest Bangumi Data</label>

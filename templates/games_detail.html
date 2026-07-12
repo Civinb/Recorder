@@ -10,10 +10,10 @@
 {% block content %}
 {% if game.image_url%}
     {% if game.image_url.startswith('http') %}
-        <img src="{{ game.image_url }}" alt="Loading failed" width="300">
+        <img src="{{ game.image_url }}" alt="game picture" width="300">
     {% else %}
         <img src="{{url_for('static', filename='uploads/gamePic/' + game.image_url)}}"
-            alt="Loading failed" width="300">
+            alt="game picture" width="300">
     {% endif %}
 {% endif %}
     <p><strong>Type: </strong>{{ game.type.value }}</p>
@@ -23,10 +23,10 @@
     <p><strong>Reviews: </strong>{{ game.reviews }}</p>
     <strong>Links</strong>
 {% if game.igdb_links %}
-    <p><a href="{{ game.igdb_links }}" target="_blank">IGDB</a></p>
+    <p><a href="{{ game.igdb_links }}" target="_blank" rel="noopener noreferrer">IGDB</a></p>
 {% endif %}
 {% if game.official_links %}
-    <p><a href="{{ game.official_links }}" target="_blank">Official Site</a></p>
+    <p><a href="{{ game.official_links }}" target="_blank" rel="noopener noreferrer">Official Site</a></p>
 {% endif %}
     <p><strong>Status: </strong>{{ game.status.value if game.status else 'Unknown' }}</p>
 {% endblock %}

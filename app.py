@@ -1,6 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 from pathlib import Path
 import uuid
 
@@ -59,7 +57,7 @@ def home():
     return render_template("home.html")
 
 
-@app.route("/settings", methods = ["GET", "POST"])                                             #设置页面
+@app.route("/settings", methods = ["GET", "POST"])                  #设置页面
 def settings():
     if request.method == "POST":
         bgpic_file = request.files.get("bg_pic")

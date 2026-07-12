@@ -8,13 +8,12 @@
 {% endblock %}
 
 {% block content %}
-{% if anime.image_url%}
-    {% if anime.image_url.startswith('http') %}
-        <img src="{{ anime.image_url }}" alt="Loading failed" width="300">
-    {% else %}
-        <img src="{{url_for('static', filename='uploads/animePic/' + anime.image_url)}}"
-            alt="Loading failed" width="300">
-    {% endif %}
+{% if anime.image_url %}
+    <img src="{{url_for('static', filename='uploads/animePic/' + anime.image_url)}}"
+        alt="anime picture" width="300">
+{% else %}
+    <img src="{{url_for('static', filename='default/defaultPic.png')}}"
+        alt="anime picture" width="300">
 {% endif %}
     <p><strong>Type: </strong>{{ anime.type.value }}</p>
     <p><strong>Boardcast date: </strong>{{ anime.broadcast_date.strftime('%Y-%m-%d') if anime.broadcast_date else 'Unknown' }}</p>
@@ -23,10 +22,10 @@
     <p><strong>Reviews: </strong>{{ anime.reviews }}</p>
     <strong>Links</strong>
 {% if anime.bangumi_links %}
-    <p><a href="{{ anime.bangumi_links }}" target="_blank">Bangumi</a></p>
+    <p><a href="{{ anime.bangumi_links }}" target="_blank" rel="noopener noreferrer">Bangumi</a></p>
 {% endif %}
 {% if anime.official_links %}
-    <p><a href="{{ anime.official_links }}" target="_blank">Official Site</a></p>
+    <p><a href="{{ anime.official_links }}" target="_blank" rel="noopener noreferrer">Official Site</a></p>
 {% endif %}
     <p><strong>Status: </strong>{{ anime.status.value if anime.status else 'Unknown' }}</p>
 {% endblock %}
