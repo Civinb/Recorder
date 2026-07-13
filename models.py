@@ -26,7 +26,7 @@ class Anime(db.Model):                                           #数据库中�
     name = db.Column(db.String(80), nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
     type = db.Column(db.Enum(animeType), nullable=False, default=animeType.TV)
-    broadcast_date = db.Column(db.Date, nullable=True)
+    release_date = db.Column(db.Date, nullable=True)
     summary = db.Column(db.Text, nullable=True)
     score = db.Column(db.Float, nullable=True)
     reviews = db.Column(db.Text, nullable=True)

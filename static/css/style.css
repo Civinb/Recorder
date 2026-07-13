@@ -80,21 +80,21 @@ th {
 
 
 /* Header link styles */
-div.header-link{
+.header-link {
      margin: 10px;
 }
 
-div.header-link a{
+.header-link {
     display: block;
     padding: 10px 20px 10px 20px;
 }
-
-div.header-link a:hover{
+ 
+.header-link:hover {
     background-color: rgba(227, 234, 87, 0.3);
     border-radius: 15px;
 }
 
-div.header-link a:hover, div.header-link a:active{
+.header-link:hover, .header-link:active {
     color: rgb(52, 86, 28);
     text-decoration: none;
 }
@@ -134,4 +134,25 @@ div.header-link a:hover, div.header-link a:active{
 
 .home_card.game {
     background-image: url("../default/gameCard.png");
+}
+
+
+.delete-button {
+    background-color: #fa4619;
+    color: white;
+    border: none;
+    padding: 10px 20px 10px 20px;
+    text-align: center;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+
+.icon {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    vertical-align: middle;
+    margin-right: 5px;
 }

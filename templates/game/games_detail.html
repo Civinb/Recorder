@@ -1,0 +1,8 @@
+{% extends "shared/detail_base.html" %}
+
+
+{% set pic_dir = "gamePic" %}
+{% set back_url = url_for('game.games') %}
+{% set edit_url = url_for('game.game_edit', game_id=medium.id) %}
+{% set delete_url = url_for('game.game_delete', game_id=medium.id) %}
+

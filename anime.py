@@ -18,7 +18,7 @@ ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}  #允许上传�
 @anime_bp.route("/list")                                         #animeslist页面
 def animes():
     animes = Anime.query.all()
-    return render_template("animes_list.html", animes=animes)
+    return render_template("anime/animes_list.html", animes=animes)
 
 
 @anime_bp.route("/new", methods=["GET", "POST"])                 #处理/animes/new路径的GET和POST请求，GET请求用于显示添加新动漫的表单页面，POST请求用于处理表单提交的数据并将新动漫添加到数据库中。
@@ -51,18 +51,18 @@ def anime_new():
         if not safe_name and bangumi_id:
             safe_name = _download_bangumi_cover(bangumi_id)
 
-        broadcast_date_str = request.form["broadcast_date"]
-        if broadcast_date_str:
-            broadcast_date = datetime.strptime(broadcast_date_str, "%Y-%m-%d").date()
+        release_date_str = request.form["release_date"]
+        if release_date_str:
+            release_date = datetime.strptime(release_date_str, "%Y-%m-%d").date()
         else:
-            broadcast_date = None
+            release_date = None
 
-        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links, broadcast_date=broadcast_date, type=type, status=status, score=score, image_url=safe_name, bangumi_id=bangumi_id)
+        anime_new = Anime(name=name, summary=summary, reviews=reviews, bangumi_links=bangumi_links, official_links=official_links, release_date=release_date, type=type, status=status, score=score, image_url=safe_name, bangumi_id=bangumi_id)
         db.session.add(anime_new)
         db.session.commit()
         return redirect(url_for('anime.animes'))
 
-    return render_template('animes_new.html')
+    return render_template('anime/animes_new.html')
 
 
 
@@ -70,7 +70,7 @@ def anime_new():
 @anime_bp.route("/<int:anime_id>")                                 #处理/animes/<anime_id>路径的GET请求，用于显示指定ID的动漫详情页面。
 def anime_detail(anime_id):
     anime = Anime.query.get_or_404(anime_id)
-    return render_template("animes_detail.html", anime=anime)
+    return render_template("anime/animes_detail.html", medium=anime)
 
 
 
@@ -101,16 +101,16 @@ def anime_edit(anime_id):
                         old_path.unlink()
                 anime.image_url = safe_name
         
-        broadcast_date_str = request.form["broadcast_date"]
-        if broadcast_date_str:
-            anime.broadcast_date = datetime.strptime(broadcast_date_str, "%Y-%m-%d").date()
+        release_date_str = request.form["release_date"]
+        if release_date_str:
+            anime.release_date = datetime.strptime(release_date_str, "%Y-%m-%d").date()
         else:
-            anime.broadcast_date = None
+            anime.release_date = None
         
         db.session.commit()
         return redirect(url_for('anime.anime_detail', anime_id=anime.id))
 
-    return render_template("animes_edit.html", anime=anime)
+    return render_template("anime/animes_edit.html", anime=anime)
 
 
 

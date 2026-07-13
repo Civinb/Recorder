@@ -1,0 +1,52 @@
+{% extends "shared/list_base.html" %}
+
+{% block title %}Game List{% endblock %}
+
+{% block header %}
+    {{ super() }}
+    <header style="text-align: center;">
+        <h1>Game List</h1>
+    </header>
+{% endblock %}
+
+{% block filter %}
+    <label for="typeSelect"> 类型
+        <select name="typeSelect" id="typeSelect">
+            <option value="">所有</option>
+            <option value="PC">PC</option>
+            <option value="CONSOLE">Console</option>
+            <option value="MOBILE">Mobile</option>
+            <option value="ONLINE">ONLINE</option>
+        </select>
+    </label>
+
+    <label for="statusSelect"> 状态
+        <select name="statusSelect" id="statusSelect">
+            <option value="">所有</option>
+            <option value="PLAYING">Playing</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="PLANNING">Planning</option>
+            <option value="DROPPED">Dropped</option>
+            <option value="ON_HOLD">On Hold</option>
+        </select>
+    </label>
+{% endblock %}
+            
+{% block table_body %}
+    <tbody>
+        {% for game in games %}
+        <tr id="gametr">
+            <td><a href="{{url_for('game.game_detail', game_id=game.id)}}">{{ game.name }}</a></td>
+            <td>{{ game.release_date.strftime('%m-%d-%Y') if game.release_date else "" }}</td>
+            <td>{{ game.type.value}}</td>
+            <td>{{ game.status.value }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+{% endblock %}
+
+{% block footer %}
+    <div>
+        <a href="{{url_for('game.game_new')}}">Add New Game</a>
+    </div>
+{% endblock %}

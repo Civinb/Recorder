@@ -17,7 +17,7 @@ gamePic_dir = Path("static/uploads/gamePic")  # 游戏图片存放目录
 @game_bp.route("/list")
 def games():
     games = Game.query.all()
-    return render_template("games_list.html", games=games)
+    return render_template("game/games_list.html", games=games)
 
 
 @game_bp.route("/new", methods=["GET", "POST"])                 
@@ -56,13 +56,13 @@ def game_new():
         db.session.commit()
         return redirect(url_for('game.games'))
 
-    return render_template('games_new.html')
+    return render_template('game/games_new.html')
 
 
 @game_bp.route("/<int:game_id>")                                 #处理/games/<game_id>路径的GET请求，用于显示指定ID的游戏详情页面。
 def game_detail(game_id):
     game = Game.query.get_or_404(game_id)
-    return render_template("games_detail.html", game=game)
+    return render_template("game/games_detail.html", medium=game)
 
 
 @game_bp.route("/<int:game_id>/edit", methods=["GET", "POST"])                                 #单个game条目编辑
@@ -92,16 +92,16 @@ def game_edit(game_id):
                         old_path.unlink()
                 game.image_url = safe_name
         
-        broadcast_date_str = request.form["broadcast_date"]
-        if broadcast_date_str:
-            game.broadcast_date = datetime.strptime(broadcast_date_str, "%Y-%m-%d").date()
+        release_date_str = request.form["release_date"]
+        if release_date_str:
+            game.release_date = datetime.strptime(release_date_str, "%Y-%m-%d").date()
         else:
-            game.broadcast_date = None
+            game.release_date = None
         
         db.session.commit()
         return redirect(url_for('game.game_detail', game_id=game.id))
 
-    return render_template("games_edit.html", game=game)
+    return render_template("game/games_edit.html", game=game)
 
 
 

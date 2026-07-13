@@ -1,0 +1,7 @@
+{% extends "shared/detail_base.html" %}
+
+{% set pic_dir = "animePic" %}
+{% set back_url = url_for('anime.animes') %}
+{% set edit_url = url_for('anime.anime_edit', anime_id=medium.id) %}
+{% set delete_url = url_for('anime.anime_delete', anime_id=medium.id) %}
+

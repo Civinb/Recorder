@@ -54,7 +54,7 @@ def list_bgpic():
 
 @app.route("/home")                                                 #主页面
 def home():
-    return render_template("home.html")
+    return render_template("pages/home.html")
 
 
 @app.route("/settings", methods = ["GET", "POST"])                  #设置页面
@@ -68,7 +68,7 @@ def settings():
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 bgpic_file.save(bgpic_dir / safe_name)
     images = list_bgpic()
-    return render_template("settings.html", images = images)
+    return render_template("pages/settings.html", images = images)
 
 
 @app.route("/settings/bgchange/<bg_name>")

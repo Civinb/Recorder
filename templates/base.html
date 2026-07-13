@@ -12,6 +12,7 @@
     </style>
     <title>
         {% block title %}
+            CVBRecorder
         {% endblock %}
     </title>
 </head>
@@ -27,18 +28,16 @@
                 </a>
                 
                 <div style="margin-top: 30px; margin-right: 200px; display: flex; margin-left: auto;">
-                    <div class="header-link">
-                        <a href="{{url_for('home')}}">Home</a>
-                    </div>
-                    <div class="header-link">
-                        <a href="{{url_for('anime.animes')}}">Animes</a>
-                    </div>
-                    <div class="header-link">
-                        <a href="{{url_for('game.games')}}">Games</a>
-                    </div>
-                    <div class="header-link">
-                        <a href="{{url_for('settings')}}">Setting</a>
-                    </div>
+                        <a class="header-link" href="{{url_for('home')}}">Home</a>
+
+                        <a class="header-link" href="{{url_for('anime.animes')}}">Animes</a>
+
+
+                        <a class="header-link" href="{{url_for('game.games')}}">Games</a>
+
+
+                        <a class="header-link" href="{{url_for('settings')}}">Setting</a>
+
                 </div>
             </div>
         <br>
@@ -48,6 +47,9 @@
     {% endblock %}
 
     {% block footer %}
+    {% endblock %}
+
+    {% block scripts %}
     {% endblock %}
 </body>
 </html>

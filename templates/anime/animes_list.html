@@ -1,0 +1,51 @@
+{% extends "shared/list_base.html" %}
+
+{% block title %}Anime List{% endblock %}
+
+{% block header %}
+    {{ super() }}
+    <header style="text-align: center;">
+        <h1>Anime List</h1>
+    </header>
+{% endblock %}
+{% block filter %}
+    <label for="typeSelect"> 类型
+        <select name="typeSelect" id="typeSelect">
+            <option value="">所有</option>
+            <option value="TV">TV</option>
+            <option value="Movie">Movie</option>
+            <option value="OVA">OVA</option>
+        </select>
+    </label>
+
+    <label for="statusSelect"> 状态
+        <select name="statusSelect" id="statusSelect">
+            <option value="">所有</option>
+            <option value="Watching">Watching</option>
+            <option value="Completed">Completed</option>
+            <option value="Planning">Planning</option>
+            <option value="Dropped">Dropped</option>
+            <option value="On Hold">On Hold</option>
+        </select>
+    </label>
+{% endblock %}
+{% block table_body %}
+    <tbody>
+        {% for anime in animes %}
+        <tr id="animetr">
+            <td><a href="{{url_for('anime.anime_detail', anime_id=anime.id)}}">{{ anime.name }}</a></td>
+            <td>{{ anime.release_date.strftime('%m-%d-%Y') if anime.release_date else "" }}</td>
+            <td>{{ anime.type.value}}</td>
+            <td>{{ anime.status.value }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+{% endblock %}
+
+{% block footer %}
+<nav>
+    <ul>
+        <li><a href="{{url_for('anime.anime_new')}}">Add New Anime</a></li>
+    </ul>
+</nav>
+{% endblock %}

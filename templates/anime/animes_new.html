@@ -58,7 +58,7 @@
 
     <p>
         <label>Broadcast date: </label>
-        <input type="date" name="broadcast_date" id="broadcast_date">
+        <input type="date" name="release_date" id="release_date">
     </p>
 
     <p>
@@ -168,7 +168,7 @@
         document.getElementById('name').value = s.name_cn || s.name || '';
         document.getElementById('summary').value = s.summary || '';
         document.getElementById('bangumi_links').value = 'https://bgm.tv/subject/' + s.id;
-        if (s.date) document.getElementById('broadcast_date').value = s.date;
+        if (s.date) document.getElementById('release_date').value = s.date;
         const typeSel = document.getElementById('type');
         if (s.mapped_type) {
             for (const opt of typeSel.options) {
