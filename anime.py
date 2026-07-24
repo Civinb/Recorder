@@ -110,7 +110,7 @@ def anime_edit(anime_id):
         db.session.commit()
         return redirect(url_for('anime.anime_detail', anime_id=anime.id))
 
-    return render_template("anime/animes_edit.html", anime=anime)
+    return render_template("anime/animes_edit.html", medium=anime)
 
 
 

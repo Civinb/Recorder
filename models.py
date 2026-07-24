@@ -7,7 +7,7 @@ from db import db
 
 
 class animeStatus(enum.Enum):                                         #动漫状态枚举类，包含了动漫的各种状态，如正在观看、已完成、计划观看、已放弃和搁置等。
-    WACHING = "Watching"
+    WATCHING = "Watching"
     COMPLETED = "Completed"
     PLANNING = "Planning"
     DROPPED = "Dropped"

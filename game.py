@@ -101,7 +101,7 @@ def game_edit(game_id):
         db.session.commit()
         return redirect(url_for('game.game_detail', game_id=game.id))
 
-    return render_template("game/games_edit.html", game=game)
+    return render_template("game/games_edit.html", medium=game)
 
 
 

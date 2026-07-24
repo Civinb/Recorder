@@ -89,7 +89,7 @@ function sortTable(index){
             const dy = parseDate(y);
             return od ? dx - dy : dy - dx;
         }
-        return od ? x.localeCompare(y) : y.localeCompare(x);
+        return od ? x.localeCompare(y, "zh-Hans-CN", { numeric: true }) : y.localeCompare(x, "zh-Hans-CN", { numeric: true });
     })
     od = !od;
     pagerows.forEach(row => tbody.appendChild(row));        

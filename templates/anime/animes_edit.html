@@ -1,88 +1,35 @@
-{% extends "base.html" %}
+{% extends "shared/edit_base.html" %}
 
-{% block title %}Edit Anime{% endblock %}
+{% set pic_dir = "animePic" %}
+{% set back_url = url_for('anime.animes') %}
 
-{% block header %}
-{{ super() }}
-<h1>Edit</h1>
-{% endblock %}
-
-{% block content %}
-<form method="POST" enctype="multipart/form-data">
-    <p>
-        <label>Name: </label>
-        <input type="text" placeholder="e.g. STEINS;GATE" value="{{anime.name}}" name="name">
-    </p>
-
-    <p>
-        <label>Current Image: </label>
-        {%if anime.image_url %}
-            {% if anime.image_url.startswith('http') %}
-                <img src="{{ anime.image_url }}" alt="Loading failed" width="200">
-            {% else %}
-                <img src="{{ url_for('static', filename='uploads/animePic/' + anime.image_url) }}" alt="Loading failed" width="200">
-            {% endif %}
-        {% else %}
-            No image uploaded.
-        {% endif %}
-    </p>
-
-    <p>
-        <label>Change Image: </label>
-        <input type="file" name="image_file" accept="image/*">
-    </p>
-
-    <p>
-        <label>Summary: </label>
-        <textarea name="summary" id="summary" cols="30" rows="5">{{anime.summary}}</textarea>
-    </p>
-
-    <p>
-        <label>Your review: </label>
-        <textarea name="reviews" id="reviews" cols="30" rows="5">{{anime.reviews}}</textarea>
-    </p>
-
-    <p>
-        <label>Your Score: </label>
-        <input type="number" name="score" min="0" max="10" step="0.1" value="{{anime.score if anime.score is not none else '7.0'}}">
-    </p>
-
+{% block type %}
     <p>
         <label>Type: </label>
         <select name="type">
-            <option value="TV" {% if anime.type == 'TV' %}selected{% endif %}>TV</option>
-            <option value="MOVIE" {% if anime.type == 'MOVIE' %}selected{% endif %}>Movie</option>
-            <option value="OVA" {% if anime.type == 'OVA' %}selected{% endif %}>OVA</option>
+            <option value="TV" {% if medium.type.name == 'TV' %}selected{% endif %}>TV</option>
+            <option value="MOVIE" {% if medium.type.name == 'MOVIE' %}selected{% endif %}>Movie</option>
+            <option value="OVA" {% if medium.type.name == 'OVA' %}selected{% endif %}>OVA</option>
         </select>
     </p>
+{% endblock %}
 
-    <p>
-        <label>Broadcast date: </label>
-        <input type="date" name="release_date" value="{{ anime.release_date.strftime('%Y-%m-%d') if anime.release_date else '' }}">
-    </p>
-
+{% block databaseLinks %}
     <p>
         <label>Bangumi link: </label>
-        <input type="text" placeholder="e.g. https://chii.in/subject/10380" value="{{anime.bangumi_links}}" name="bangumi_links">
+        <input type="text" placeholder="e.g. https://chii.in/subject/10380" value="{{medium.bangumi_links}}" name="bangumi_links">
     </p>
-
-    <p>
-        <label>Official link: </label>
-        <input type="text" placeholder="e.g. https://steinsgate.jp/" value="{{anime.official_links}}" name="official_links">
-    </p>
-
+{% endblock %}
+    
+{% block status %}
     <p>
         <label>Status: </label>
         <select name="status" >
-            <option value="WACHING" {% if anime.status == 'WACHING' %}selected{% endif %}>Watching</option>
-            <option value="COMPLETED" {% if anime.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
-            <option value="PLANNING" {% if anime.status == 'PLANNING' %}selected{% endif %}>Planning</option>
-            <option value="DROPPED" {% if anime.status == 'DROPPED' %}selected{% endif %}>Dropped</option>
-            <option value="ON_HOLD" {% if anime.status == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
+            <option value="WATCHING" {% if medium.status.name == 'WATCHING' %}selected{% endif %}>Watching</option>
+            <option value="COMPLETED" {% if medium.status.name == 'COMPLETED' %}selected{% endif %}>Completed</option>
+            <option value="PLANNING" {% if medium.status.name == 'PLANNING' %}selected{% endif %}>Planning</option>
+            <option value="DROPPED" {% if medium.status.name == 'DROPPED' %}selected{% endif %}>Dropped</option>
+            <option value="ON_HOLD" {% if medium.status.name == 'ON_HOLD' %}selected{% endif %}>On Hold</option>
         </select>
     </p>
-
-    <hr>
-    <button type="submit">Submit</button> <a href="{{url_for('anime.anime_detail', anime_id=anime.id)}}">Cancel</a>
-</form>
 {% endblock %}

@@ -13,10 +13,10 @@
     <div style="display: flex; align-items: flex-start; gap: 20px; margin: 30px; ">
         {% if medium.image_url %}
             <img src="{{url_for('static', filename='uploads/' + pic_dir + '/' + medium.image_url)}}"
-            alt="picture" width="300">
+                alt="picture" width="300">
         {% else %}
             <img src="{{url_for('static', filename='default/defaultPic.png')}}"
-            alt="picture" width="300">
+                alt="Loading failed" width="300">
         {% endif %}
         <div>
             <p><strong>Type: </strong>{{ medium.type.value }}</p>
