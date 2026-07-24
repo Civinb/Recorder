@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {{ super() }}
+    <h1>Create new record</h1>
+{% endblock %}
+
+{% block content %}
+    <section>
+        <strong>从搜索导入</strong>
+        <div>
+            <input type="text" id="search" placeholder="输入名称搜索">
+            <div id="suggest" hidden></div>
+        </div>
+        <div id="status"></div>
+    </section>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id" id="id">
+        <p>
+            <label>Name: </label>
+            <input type="text" id="name" placeholder="e.g. Trails in the Sky" name="name">
+        </p>
+
+        <p>
+            <label>Upload Image: </label>
+            <input type="file" name="image_file" accept="image/*">
+        </p>
+
+        <p>
+            <label>Summary: </label>
+            <textarea name="summary" id="summary" cols="30" rows="5"></textarea>
+        </p>
+
+        <p>
+            <label>Your review: </label>
+            <textarea name="reviews" id="reviews" cols="30" rows="5"></textarea>
+        </p>
+
+        <p>
+            <label>Your Score: </label>
+            <input type="number" name="score" min="0" max="10" step="0.1" value="7">
+        </p>
+
+        {% block type %}
+
+        {% endblock %}
+
+        <p>
+            <label>release date: </label>
+            <input type="date" name="release_date" id="release_date">
+        </p>
+
+        {% block databaseLinks %}
+
+        {% endblock %}
+
+        <p>
+            <label>Official link: </label>
+            <input type="text" name="official_links" placeholder="e.g. https://trailsfirstchapter.com/">
+        </p>
+        
+        {% block status %}
+
+        {% endblock %}
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+    (function () {
+        const input = document.getElementById('search');
+        const suggest = document.getElementById('suggest');
+        const status = document.getElementById('status');
+
+        let timer = null;
+        let lastQ = '';
+
+        function debounce(fn, ms) {
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), ms);
+            };
+        }
+
+        let lastItems = [];
+
+        async function doSearch(q) {
+            if (!q || q === lastQ) return;
+            lastQ = q;
+            status.textContent = '搜索中...';
+            try {
+                const r = await fetch('{{ search_api }}?query=' + encodeURIComponent(q));
+                const data = await r.json();
+                const results = data.results || [];
+                lastItems = results;
+                renderSuggest(results);
+                status.textContent = `找到 ${data.count != null ? data.count : results.length} 条结果`;
+            } catch (e) {
+                status.textContent = '请求失败: ' + e.message;
+                suggest.hidden = true;
+            }
+        }
+
+        function renderSuggest(items) {
+            if (!items.length) {
+                suggest.innerHTML = '<div class="item">无结果</div>';
+                suggest.hidden = false;
+                return;
+            }
+            suggest.innerHTML = items.map(it => {
+                const meta = [it.released, it.rating ? '★' + it.rating : ''].filter(Boolean).join(' · ');
+                return `<div class="item" data-id="${it.id}">
+                    <div><strong>${escapeHtml(it.name)}</strong></div>
+                    <div class="meta">${escapeHtml(meta)} · id=${it.id}</div>
+                </div>`;
+            }).join('');
+            suggest.hidden = false;
+            suggest.querySelectorAll('.item[data-id]').forEach(el => {
+                el.addEventListener('click', () => selectGame(parseInt(el.dataset.id, 10)));
+            });
+        }
+
+        function escapeHtml(s) {
+            return (s == null ? '' : String(s))
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        async function selectGame(id) {
+            suggest.hidden = true;
+            status.textContent = '加载详情...';
+            try {
+                const r = await fetch('/api/rawg/game/' + id);
+                const game = await r.json();
+                fillForm(game);
+                status.textContent = `已填入: ${game.name} (id=${id})`;
+            } catch (e) {
+                status.textContent = '加载失败: ' + e.message;
+            }
+        }
+
+        function guessType(platforms) {
+            const names = (platforms || []).map(p => (p.platform && p.platform.name || '').toLowerCase());
+            if (names.some(n => n.includes('ios') || n.includes('android'))) return 'MOBILE';
+            if (names.some(n => n.includes('pc') || n.includes('linux') || n.includes('mac'))) return 'PC';
+            if (names.length) return 'CONSOLE';
+            return '';
+        }
+
+        function fillForm(g) {
+            document.getElementById('id').value = g.id;
+            document.getElementById('name').value = g.name || '';
+            document.getElementById('summary').value = g.description_raw || '';
+            if (g.released) document.getElementById('release_date').value = g.released;
+            const official = document.querySelector('[name=official_links]');
+            if (official && g.website) official.value = g.website;
+            const dbLink = document.getElementById('rawg_links');
+            if (dbLink && g.slug) dbLink.value = 'https://rawg.io/games/' + g.slug;
+            const typeSel = document.getElementById('type');
+            const mappedType = guessType(g.platforms);
+            if (typeSel && mappedType) {
+                for (const opt of typeSel.options) {
+                    if (opt.value === mappedType) { typeSel.value = mappedType; break; }
+                }
+            }
+            input.value = g.name || '';
+        }
+
+        const debounced = debounce(doSearch, 500);
+        input.addEventListener('input', e => {
+            const q = e.target.value.trim();
+            if (q.length < 1) {
+                suggest.hidden = true;
+                status.textContent = '';
+                return;
+            }
+            debounced(q);
+        });
+
+        document.addEventListener('click', e => {
+            if (!suggest.contains(e.target) && e.target !== input) {
+                suggest.hidden = true;
+            }
+        });
+        input.addEventListener('focus', () => {
+            if (suggest.children.length) suggest.hidden = false;
+        });
+    })();
+    </script>
+{% endblock %}

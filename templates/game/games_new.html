@@ -1,42 +1,11 @@
-{% extends "base.html" %}
+{% extends "shared/new_base.html" %}
 
-{% block title %}New Game{% endblock %}
-
-{% block header %}
-{{ super() }}
-<h1>Create new record</h1>
-<h2>Game</h2>
+{% block title %}
+    New Game
 {% endblock %}
 
-{% block content %}
 
-
-<form method="POST" enctype="multipart/form-data" id="game-form">
-    <p>
-        <label>Name: </label>
-        <input type="text" id="name" placeholder="e.g. Trails in the Sky" name="name">
-    </p>
-
-    <p>
-        <label>Upload Image: </label>
-        <input type="file" name="image_file" accept="image/*">
-    </p>
-
-    <p>
-        <label>Summary: </label>
-        <textarea name="summary" id="summary" cols="30" rows="5"></textarea>
-    </p>
-
-    <p>
-        <label>Your review: </label>
-        <textarea name="reviews" id="reviews" cols="30" rows="5"></textarea>
-    </p>
-
-    <p>
-        <label>Your Score: </label>
-        <input type="number" name="score" min="0" max="10" step="0.1" value="7">
-    </p>
-
+{% block type %}
     <p>
         <label>Type: </label>
         <select name="type" id="type">
@@ -46,22 +15,16 @@
             <option value="ONLINE">ONLINE</option>
         </select>
     </p>
+{% endblock %}
 
+{% block databaseLinks %}
     <p>
-        <label>release date: </label>
-        <input type="date" name="release_date" id="release_date">
+        <label>RAWG link: </label>
+        <input type="text" id="rawg_links" placeholder="e.g. https://rawg.io/games/black-jacket" name="rawg_links">
     </p>
+{% endblock %}
 
-    <p>
-        <label>IGDB link: </label>
-        <input type="text" id="igdb_links" placeholder="e.g. https://www.igdb.com/games/trails-in-the-sky-1st-chapter" name="igdb_links">
-    </p>
-
-    <p>
-        <label>Official link: </label>
-        <input type="text" name="official_links" placeholder="e.g. https://trailsfirstchapter.com/">
-    </p>
-
+{% block status %}
     <p>
         <label>Status: </label>
         <select name="status">
@@ -72,7 +35,5 @@
             <option value="ON_HOLD">On Hold</option>
         </select>
     </p>
-
-    <button type="submit">Submit</button>
-</form>
 {% endblock %}
+

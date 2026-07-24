@@ -3,10 +3,11 @@ from pathlib import Path
 import uuid
 from datetime import datetime
 
+
 import anime
 from models import Game
 from db import db
-
+from rawg_api import _download_rawg_cover
 
 
 game_bp = Blueprint('game', __name__, url_prefix="/games")
@@ -28,12 +29,12 @@ def game_new():
         name = request.form["name"]
         summary = request.form["summary"]
         reviews = request.form["reviews"]
-        igdb_links = request.form["igdb_links"]
+        igdb_links = request.form["rawg_links"]
         official_links = request.form["official_links"]
         type = request.form["type"]
         status = request.form["status"]
         score = float(request.form["score"])
-
+        rawg_id = request.form.get("id")
 
         safe_name = None
         image_file = request.files.get("image_file")
@@ -44,6 +45,8 @@ def game_new():
                 upload_dir.mkdir(parents=True, exist_ok=True)
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 image_file.save(upload_dir / safe_name)
+        if not safe_name and rawg_id:
+            safe_name = _download_rawg_cover(rawg_id)
 
         release_date_str = request.form["release_date"]
         if release_date_str:
@@ -56,7 +59,7 @@ def game_new():
         db.session.commit()
         return redirect(url_for('game.games'))
 
-    return render_template('game/games_new.html')
+    return render_template('game/games_new.html', search_api='/api/rawg/search')
 
 
 @game_bp.route("/<int:game_id>")                                 #处理/games/<game_id>路径的GET请求，用于显示指定ID的游戏详情页面。

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from pathlib import Path
 import uuid
+from rawg_api import rawg_bp
 
 from db import db
 from anime import anime_bp, ALLOWED_EXTENSIONS
@@ -40,6 +41,7 @@ with app.app_context():
 app.register_blueprint(anime_bp)                                   #引入blueprint
 app.register_blueprint(bangumi_bp)
 app.register_blueprint(game_bp)
+app.register_blueprint(rawg_bp)
 
 
 def list_bgpic():
