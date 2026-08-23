@@ -10,18 +10,18 @@ from bangumi_api import _download_bangumi_cover
 
 
 anime_bp = Blueprint('anime', __name__, url_prefix="/animes")
-ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}  #允许上传的图片文件扩展名集合，包含了常见的图片格式，如JPG、JPEG、PNG、GIF和WEBP等。
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}  #Set of image file extensions allowed for upload, covering the common formats: JPG, JPEG, PNG, GIF and WEBP.
 
 
 
 
-@anime_bp.route("/list")                                         #animeslist页面
+@anime_bp.route("/list")                                         #animes list page
 def animes():
     animes = Anime.query.all()
     return render_template("anime/animes_list.html", animes=animes)
 
 
-@anime_bp.route("/new", methods=["GET", "POST"])                 #处理/animes/new路径的GET和POST请求，GET请求用于显示添加新动漫的表单页面，POST请求用于处理表单提交的数据并将新动漫添加到数据库中。
+@anime_bp.route("/new", methods=["GET", "POST"])                 #Handles GET and POST requests for /animes/new: GET renders the form page for adding a new anime, POST processes the submitted data and stores the new anime in the database.
 def anime_new():
     
     if request.method == "POST":
@@ -47,7 +47,7 @@ def anime_new():
                 safe_name = f"{uuid.uuid4().hex}{ext}"
                 image_file.save(upload_dir / safe_name)
 
-        # 用户未手动上传图片但有 bangumi_id → 自动抓封面
+        # No image uploaded manually but a bangumi_id is present -> fetch the cover automatically
         if not safe_name and bangumi_id:
             safe_name = _download_bangumi_cover(bangumi_id)
 
@@ -67,14 +67,14 @@ def anime_new():
 
 
 
-@anime_bp.route("/<int:anime_id>")                                 #处理/animes/<anime_id>路径的GET请求，用于显示指定ID的动漫详情页面。
+@anime_bp.route("/<int:anime_id>")                                 #Handles GET requests for /animes/<anime_id>, showing the detail page of the anime with the given ID.
 def anime_detail(anime_id):
     anime = Anime.query.get_or_404(anime_id)
     return render_template("anime/animes_detail.html", medium=anime)
 
 
 
-@anime_bp.route("/<int:anime_id>/edit", methods=["GET", "POST"])                                 #单个anime条目编辑
+@anime_bp.route("/<int:anime_id>/edit", methods=["GET", "POST"])                                 #Edit a single anime entry
 def anime_edit(anime_id):
     anime = Anime.query.get_or_404(anime_id)
     if request.method == "POST":
@@ -114,7 +114,7 @@ def anime_edit(anime_id):
 
 
 
-@anime_bp.route("/<int:anime_id>/delete", methods=["POST"])                             #条目删除
+@anime_bp.route("/<int:anime_id>/delete", methods=["POST"])                             #Delete an entry
 def anime_delete(anime_id):
     anime = Anime.query.get_or_404(anime_id)
     if anime.image_url:

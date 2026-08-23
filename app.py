@@ -10,12 +10,12 @@ from bangumi_api import bangumi_bp, _migrate_add_bangumi_id
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///main.db"      #配置Flask应用程序使用SQLite数据库，并指定数据库文件为main.db。
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///main.db"      #Configure the Flask app to use SQLite, with main.db as the database file.
 db.init_app(app)
 
 
 bgpic_dir = Path("static/background_pic")
-CURRENT_BG_FILE = Path("current_bg.txt")          # 记录当前选中的背景文件名
+CURRENT_BG_FILE = Path("current_bg.txt")          # Stores the file name of the currently selected background
 DEFAULT_BG = "6aca374e0b6f4305a15ed59cecf1ae70.jpg"
 
 
@@ -27,7 +27,7 @@ def get_current_bg():
     return DEFAULT_BG
 
 
-@app.context_processor                             # 自动注入到所有模板，base.html 即可直接用 current_bg
+@app.context_processor                             # Injected into every template automatically, so base.html can use current_bg directly
 def inject_bg():
     return {"current_bg": get_current_bg()}
 
@@ -38,7 +38,7 @@ with app.app_context():
     _migrate_add_bangumi_id()
 
 
-app.register_blueprint(anime_bp)                                   #引入blueprint
+app.register_blueprint(anime_bp)                                   #Register blueprints
 app.register_blueprint(bangumi_bp)
 app.register_blueprint(game_bp)
 app.register_blueprint(rawg_bp)
@@ -54,12 +54,12 @@ def list_bgpic():
     return bgpic_list
 
 
-@app.route("/home")                                                 #主页面
+@app.route("/home")                                                 #Home page
 def home():
     return render_template("pages/home.html")
 
 
-@app.route("/settings", methods = ["GET", "POST"])                  #设置页面
+@app.route("/settings", methods = ["GET", "POST"])                  #Settings page
 def settings():
     if request.method == "POST":
         bgpic_file = request.files.get("bg_pic")
@@ -75,7 +75,7 @@ def settings():
 
 @app.route("/settings/bgchange/<bg_name>")
 def choose_bg(bg_name):
-    if bg_name in list_bgpic():                    # 校验：必须是已存在的图片，防止乱传
+    if bg_name in list_bgpic():                    # Validation: must be an existing image, to block arbitrary values
         CURRENT_BG_FILE.write_text(bg_name, encoding="utf-8")
     return redirect(url_for("settings"))
 

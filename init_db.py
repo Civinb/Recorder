@@ -1,7 +1,7 @@
-'''初始化数据库'''
+'''Initializes the database'''
 
 from app import app, db
 
 with app.app_context():
     db.create_all()
-    print('数据库初始化完成')
+    print('Database initialization complete')

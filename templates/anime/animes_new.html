@@ -10,9 +10,9 @@
 
 {% block content %}
 <section>
-    <strong>从 Bangumi 搜索导入</strong>
+    <strong>Import from a Bangumi search</strong>
     <div>
-        <input type="text" id="bgm-search" placeholder="输入动画名（中/日/英），自动从本地 bangumi 索引搜索">
+        <input type="text" id="bgm-search" placeholder="Type an anime name (CN/JP/EN) to search the local bangumi index">
         <div id="bgm-suggest" hidden></div>
     </div>
     <div id="bgm-status"></div>
@@ -29,7 +29,7 @@
     <p>
         <label>Upload Image: </label>
         <input type="file" name="image_file" accept="image/*">
-        <span>（未上传且选了 bangumi 条目时，将自动从 Bangumi 抓取封面）</span>
+        <span>(If no file is uploaded and a bangumi subject is selected, the cover is fetched from Bangumi automatically)</span>
     </p>
 
     <p>
@@ -105,26 +105,26 @@
     async function doSearch(q) {
         if (!q || q === lastQ) return;
         lastQ = q;
-        status.textContent = '搜索中...';
+        status.textContent = 'Searching...';
         try {
             const r = await fetch('/api/bangumi/search?q=' + encodeURIComponent(q));
             const data = await r.json();
             if (!data.ok) {
-                status.textContent = '错误: ' + (data.error || '未知');
+                status.textContent = 'Error: ' + (data.error || 'Unknown');
                 suggest.hidden = true;
                 return;
             }
             renderSuggest(data.results);
-            status.textContent = `找到 ${data.results.length} 条结果`;
+            status.textContent = `Found ${data.results.length} results`;
         } catch (e) {
-            status.textContent = '请求失败: ' + e.message;
+            status.textContent = 'Request failed: ' + e.message;
             suggest.hidden = true;
         }
     }
 
     function renderSuggest(items) {
         if (!items.length) {
-            suggest.innerHTML = '<div class="item">无结果</div>';
+            suggest.innerHTML = '<div class="item">No results</div>';
             suggest.hidden = false;
             return;
         }
@@ -150,16 +150,16 @@
     }
 
     async function selectSubject(id) {
-        status.textContent = '加载详情...';
+        status.textContent = 'Loading details...';
         suggest.hidden = true;
         try {
             const r = await fetch('/api/bangumi/subject/' + id);
             const data = await r.json();
             if (!data.ok) throw new Error(data.error);
             fillForm(data.subject);
-            status.textContent = `已填入: ${data.subject.name_cn || data.subject.name} (id=${id})`;
+            status.textContent = `Filled in: ${data.subject.name_cn || data.subject.name} (id=${id})`;
         } catch (e) {
-            status.textContent = '加载失败: ' + e.message;
+            status.textContent = 'Failed to load: ' + e.message;
         }
     }
 

@@ -1,24 +1,24 @@
-// 状态变量
+// State variables
 let od = true;
 let timer;
 let astext = "";
 
-// DOM 引用
+// DOM references
 const input = document.getElementById("search")
 
-// 通用工具
-function debounce(fn, ms) {                                        //防抖函数，fn为延迟执行的函数，ms为延迟时间
+// Generic helpers
+function debounce(fn, ms) {                                        //Debounce helper: fn is the deferred function, ms is the delay
     return (...args) => {
         clearTimeout(timer);
         timer = setTimeout(() => fn(...args), ms);
     };
 }
 
-//分页
+//Pagination
 let pagerows = [];
 let currentPage = 1;
 let pageSize = 10;
-function pageAction(){                                                              //控制页面条目显示
+function pageAction(){                                                              //Controls which entries are shown on the page
     pagerows.forEach(row =>{
         row.style.display = "none";
     })
@@ -28,7 +28,7 @@ function pageAction(){                                                          
     })
 }
 
-//向后或向前翻页
+//Move to the next or previous page
 function addpage(){                                             
     if(currentPage != Math.ceil(pagerows.length/pageSize)){
         currentPage++;
@@ -97,7 +97,7 @@ function sortTable(index){
     pageAction();
 }
 
-// 筛选引擎：搜索词 + 类型，两个条件都满足才显示
+// Filter engine: search term + type, a row is shown only when both conditions match
 function filterRows(){
     const rows = document.querySelectorAll("#table tbody tr");
     const aimtype = document.getElementById('typeSelect').value;
@@ -106,7 +106,7 @@ function filterRows(){
     let displayedrow = [];
     rows.forEach(row =>{
         const name = row.cells[0].innerText.toLowerCase();
-        const date = row.cells[1].innerText;          // 格式 MM-DD-YYYY，可能为空
+        const date = row.cells[1].innerText;          // Format MM-DD-YYYY, may be empty
         const type = row.cells[2].innerText;
         const status = row.cells[3].innerText;
 
@@ -128,20 +128,20 @@ function filterRows(){
     pageAction();
 }
 
-// 搜索：更新搜索词后统一筛选
+// Search: update the search term, then run the shared filter
 function search(text){
     astext = text;
     filterRows();
 }
 
-// 筛选接收
+// Filter submission handler
 function applyFilter(event) {
     event.preventDefault();
     filterRows();
     document.getElementById('filterTable').close();
 }
 
-// 事件接线
+// Event wiring
 const debounced = debounce(search, 300);
 
 input.addEventListener("input", e =>{

@@ -1,3 +1,3 @@
-'''创建db实例'''
+'''Creates the db instance'''
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()

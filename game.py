@@ -12,7 +12,7 @@ from rawg_api import _download_rawg_cover
 
 game_bp = Blueprint('game', __name__, url_prefix="/games")
 ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
-gamePic_dir = Path("static/uploads/gamePic")  # 游戏图片存放目录
+gamePic_dir = Path("static/uploads/gamePic")  # Directory where game images are stored
 
 
 @game_bp.route("/list")
@@ -62,13 +62,13 @@ def game_new():
     return render_template('game/games_new.html', search_api='/api/rawg/search')
 
 
-@game_bp.route("/<int:game_id>")                                 #处理/games/<game_id>路径的GET请求，用于显示指定ID的游戏详情页面。
+@game_bp.route("/<int:game_id>")                                 #Handles GET requests for /games/<game_id>, showing the detail page of the game with the given ID.
 def game_detail(game_id):
     game = Game.query.get_or_404(game_id)
     return render_template("game/games_detail.html", medium=game)
 
 
-@game_bp.route("/<int:game_id>/edit", methods=["GET", "POST"])                                 #单个game条目编辑
+@game_bp.route("/<int:game_id>/edit", methods=["GET", "POST"])                                 #Edit a single game entry
 def game_edit(game_id):
     game = Game.query.get_or_404(game_id)
     if request.method == "POST":
@@ -108,7 +108,7 @@ def game_edit(game_id):
 
 
 
-@game_bp.route("/<int:game_id>/delete", methods=["POST"])                             #条目删除
+@game_bp.route("/<int:game_id>/delete", methods=["POST"])                             #Delete an entry
 def game_delete(game_id):
     game = Game.query.get_or_404(game_id)
     if game.image_url:

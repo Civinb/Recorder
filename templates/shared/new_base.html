@@ -7,9 +7,9 @@
 
 {% block content %}
     <section>
-        <strong>从搜索导入</strong>
+        <strong>Import from search</strong>
         <div>
-            <input type="text" id="search" placeholder="输入名称搜索">
+            <input type="text" id="search" placeholder="Type a name to search">
             <div id="suggest" hidden></div>
         </div>
         <div id="status"></div>
@@ -88,23 +88,23 @@
         async function doSearch(q) {
             if (!q || q === lastQ) return;
             lastQ = q;
-            status.textContent = '搜索中...';
+            status.textContent = 'Searching...';
             try {
                 const r = await fetch('{{ search_api }}?query=' + encodeURIComponent(q));
                 const data = await r.json();
                 const results = data.results || [];
                 lastItems = results;
                 renderSuggest(results);
-                status.textContent = `找到 ${data.count != null ? data.count : results.length} 条结果`;
+                status.textContent = `Found ${data.count != null ? data.count : results.length} results`;
             } catch (e) {
-                status.textContent = '请求失败: ' + e.message;
+                status.textContent = 'Request failed: ' + e.message;
                 suggest.hidden = true;
             }
         }
 
         function renderSuggest(items) {
             if (!items.length) {
-                suggest.innerHTML = '<div class="item">无结果</div>';
+                suggest.innerHTML = '<div class="item">No results</div>';
                 suggest.hidden = false;
                 return;
             }
@@ -129,14 +129,14 @@
 
         async function selectGame(id) {
             suggest.hidden = true;
-            status.textContent = '加载详情...';
+            status.textContent = 'Loading details...';
             try {
                 const r = await fetch('/api/rawg/game/' + id);
                 const game = await r.json();
                 fillForm(game);
-                status.textContent = `已填入: ${game.name} (id=${id})`;
+                status.textContent = `Filled in: ${game.name} (id=${id})`;
             } catch (e) {
-                status.textContent = '加载失败: ' + e.message;
+                status.textContent = 'Failed to load: ' + e.message;
             }
         }
 

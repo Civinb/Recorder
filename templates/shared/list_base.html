@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <input type="text" placeholder="请输入名称" id="search"> 
+    <input type="text" placeholder="Enter a name" id="search">
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <div style="display: flex; gap: 12px;">
@@ -16,9 +16,9 @@
         </header>
         <form id="filterForm" onsubmit="applyFilter(event)">
             <main>
-                <label for="yearSelect"> 年份
+                <label for="yearSelect"> Year
                     <select name="yearSelect" id="yearSelect">
-                        <option value="">所有</option>
+                        <option value="">All</option>
                         <option value="1990">1990</option>
                         <option value="1991">1991</option>
                         <option value="1992">1992</option>
@@ -72,10 +72,10 @@
     <table id="table">
         <thead>
             <tr>
-                <th onclick="sortTable(0)">名称</th>
-                <th onclick="sortTable(1)">发布日期</th>
-                <th onclick="sortTable(2)">类型</th>
-                <th onclick="sortTable(3)">状态</th>
+                <th onclick="sortTable(0)">Name</th>
+                <th onclick="sortTable(1)">Release Date</th>
+                <th onclick="sortTable(2)">Type</th>
+                <th onclick="sortTable(3)">Status</th>
             </tr>
         </thead>
         {% block table_body %}
@@ -84,8 +84,8 @@
     </table>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-        <button id="pre_bt">上一页</button>
-        <button id="next_bt">下一页</button>
+        <button id="pre_bt">Previous</button>
+        <button id="next_bt">Next</button>
     </div>
 {% endblock %}
 

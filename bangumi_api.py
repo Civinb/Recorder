@@ -28,7 +28,7 @@ def bangumi_index_build():
     except FileNotFoundError as e:
         return jsonify({"ok": False, "error": str(e)}), 400
     except Exception as e:
-        current_app.logger.exception("构建 bangumi 索引失败")
+        current_app.logger.exception("Failed to build the bangumi index")
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
@@ -46,12 +46,12 @@ def bangumi_search():
 def bangumi_subject(subject_id):
     data = bangumi_index.get_subject(subject_id)
     if not data:
-        return jsonify({"ok": False, "error": "未找到该条目"}), 404
+        return jsonify({"ok": False, "error": "Subject not found"}), 404
     return jsonify({"ok": True, "subject": data})
 
 
 def _download_bangumi_cover(subject_id: int) -> str | None:
-    """调 Bangumi API 拿封面 URL 并下载到 static/uploads/animePic/，返回文件名"""
+    """Call the Bangumi API for the cover URL, download it to static/uploads/animePic/ and return the file name"""
     try:
         r = requests.get(
             f"{BANGUMI_API_BASE}/subjects/{subject_id}",
@@ -76,12 +76,12 @@ def _download_bangumi_cover(subject_id: int) -> str | None:
         (upload_dir / safe_name).write_bytes(img_resp.content)
         return safe_name
     except Exception as e:
-        current_app.logger.warning(f"下载 bangumi 封面失败 (id={subject_id}): {e}")
+        current_app.logger.warning(f"Failed to download the bangumi cover (id={subject_id}): {e}")
         return None
     
 
 def _migrate_add_bangumi_id():
-    # 用 SQLAlchemy 的 inspector 检查列。
+    # Use SQLAlchemy's inspector to check the columns.
     inspector = inspect(db.engine)
     if "anime" not in inspector.get_table_names():
         return

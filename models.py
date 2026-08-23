@@ -1,4 +1,4 @@
-'''用于存放数据库表格等'''
+'''Holds the database tables and related definitions'''
 
 
 import enum
@@ -6,7 +6,7 @@ import enum
 from db import db
 
 
-class animeStatus(enum.Enum):                                         #动漫状态枚举类，包含了动漫的各种状态，如正在观看、已完成、计划观看、已放弃和搁置等。
+class animeStatus(enum.Enum):                                         #Enum of anime statuses: watching, completed, planning, dropped, on hold, etc.
     WATCHING = "Watching"
     COMPLETED = "Completed"
     PLANNING = "Planning"
@@ -15,13 +15,13 @@ class animeStatus(enum.Enum):                                         #动漫状
     DEFAULT = "Default"
 
     
-class animeType(enum.Enum):                                           #动漫类型枚举类，包含了动漫的各种类型，如TV、Movie和OVA等。
+class animeType(enum.Enum):                                           #Enum of anime types: TV, Movie, OVA, etc.
     TV = "TV"
     MOVIE = "Movie"
     OVA = "OVA"
 
 
-class Anime(db.Model):                                           #数据库中的Anime模型，包含了动漫的各种属性，如名称、图片链接、类型、播出日期、简介、评分、评论、标签、相关链接和状态等。
+class Anime(db.Model):                                           #The Anime model in the database, holding attributes such as name, image URL, type, broadcast date, summary, score, reviews, tags, related links and status.
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
@@ -34,12 +34,12 @@ class Anime(db.Model):                                           #数据库中�
     bangumi_links = db.Column(db.String(200), nullable=True)
     official_links = db.Column(db.String(200), nullable=True)
     status = db.Column(db.Enum(animeStatus), nullable=False, default=animeStatus.DEFAULT)
-    bangumi_id = db.Column(db.Integer, nullable=True, index=True)                 # 关联的 bangumi subject id
+    bangumi_id = db.Column(db.Integer, nullable=True, index=True)                 # The associated bangumi subject id
 
 
 
 
-class gameStatus(enum.Enum):                                         #游戏状态枚举类，包含了游戏的各种状态，如正在玩、已完成、计划玩、已放弃和搁置等。
+class gameStatus(enum.Enum):                                         #Enum of game statuses: playing, completed, planning, dropped, on hold, etc.
     PLAYING = "Playing"
     COMPLETED = "Completed"
     PLANNING = "Planning"
@@ -47,7 +47,7 @@ class gameStatus(enum.Enum):                                         #游戏状�
     ON_HOLD = "On Hold"
 
 
-class gameType(enum.Enum):                                           #游戏类型枚举类
+class gameType(enum.Enum):                                           #Enum of game types
     PC = "PC"
     ONLINE = "Online"
     MOBILE = "Mobile"

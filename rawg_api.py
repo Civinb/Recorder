@@ -7,13 +7,13 @@ from sqlalchemy import inspect
 from pathlib import Path
 
 rawg_bp = Blueprint('rawg', __name__, url_prefix="/api/rawg")
-RAWG_API_KEY = os.environ.get("RAWG_API_KEY")  # 替换为你的RAWG API密钥
+RAWG_API_KEY = os.environ.get("RAWG_API_KEY")  # Set this to your own RAWG API key
 RAWG_base_url = "https://api.rawg.io/api"
 ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
 
 @rawg_bp.route("/search", methods=["GET"])
 def game_search():
-    """在 RAWG API 中搜索游戏"""
+    """Search for games through the RAWG API"""
     try:
         response = requests.get(
             f"{RAWG_base_url}/games",
@@ -29,12 +29,12 @@ def game_search():
         data = response.json()
         return jsonify({"count": data["count"], "results": data["results"]})
     except requests.exceptions.RequestException as e:
-        print(f"RAWG API 请求失败: {e}")   # ← 改成 print，脱离 Flask 也能跑
+        print(f"RAWG API request failed: {e}")   # <- switched to print so it also runs outside Flask
         return jsonify({"count": 0, "results": []}), 502
 
 @rawg_bp.route("/game/<int:game_id>", methods=["GET"])
 def get_game_details(game_id: int):
-    """获取 RAWG API 中的游戏详情"""
+    """Fetch the game details from the RAWG API"""
     try:
         response = requests.get(
             f"{RAWG_base_url}/games/{game_id}",
@@ -44,12 +44,12 @@ def get_game_details(game_id: int):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"RAWG API 请求失败: {e}")   
+        print(f"RAWG API request failed: {e}")
         return None
 
 
 def _download_rawg_cover(game_id: int) -> str | None:
-    """调 RAWG API 拿封面 URL 并下载到 static/uploads/gamePic/，返回文件名"""
+    """Call the RAWG API for the cover URL, download it to static/uploads/gamePic/ and return the file name"""
     try:
         r = requests.get(
             f"{RAWG_base_url}/games/{game_id}",
@@ -74,5 +74,5 @@ def _download_rawg_cover(game_id: int) -> str | None:
         (upload_dir / safe_name).write_bytes(img_resp.content)
         return safe_name
     except Exception as e:
-        current_app.logger.warning(f"下载 RAWG 封面失败 (id={game_id}): {e}")
+        current_app.logger.warning(f"Failed to download the RAWG cover (id={game_id}): {e}")
         return None
