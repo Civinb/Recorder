@@ -62,7 +62,15 @@ def anime_new():
         db.session.commit()
         return redirect(url_for('anime.animes'))
 
-    return render_template('anime/animes_new.html')
+    return render_template(
+        'anime/animes_new.html',
+        search_api='/api/bangumi/search',
+        detail_api='/api/bangumi/anime/',
+        id_field='bangumi_id',
+        db_link_id='bangumi_links',
+        db_link_prefix='https://bgm.tv/subject/',
+        db_link_key='id',
+    )
 
 
 

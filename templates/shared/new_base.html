@@ -16,7 +16,7 @@
     </section>
 
     <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="id" id="id">
+        <input type="hidden" name="{{ id_field }}" id="record-id">
         <p>
             <label>Name: </label>
             <input type="text" id="name" placeholder="e.g. Trails in the Sky" name="name">
@@ -25,6 +25,7 @@
         <p>
             <label>Upload Image: </label>
             <input type="file" name="image_file" accept="image/*">
+            <span>(If no file is uploaded and a search result was selected, the cover is fetched automatically)</span>
         </p>
 
         <p>
@@ -73,6 +74,13 @@
         const suggest = document.getElementById('suggest');
         const status = document.getElementById('status');
 
+       
+        const SEARCH_API = '{{ search_api }}';          // e.g. /api/rawg/search
+        const DETAIL_API = '{{ detail_api }}';          // e.g. /api/rawg/game/ (id is appended)
+        const DB_LINK_ID = '{{ db_link_id }}';          // id of the database-link input
+        const DB_LINK_PREFIX = '{{ db_link_prefix }}';  // e.g. https://rawg.io/games/
+        const DB_LINK_KEY = '{{ db_link_key }}';        // which detail field completes the link: slug or id
+
         let timer = null;
         let lastQ = '';
 
@@ -90,7 +98,7 @@
             lastQ = q;
             status.textContent = 'Searching...';
             try {
-                const r = await fetch('{{ search_api }}?query=' + encodeURIComponent(q));
+                const r = await fetch(SEARCH_API + '?query=' + encodeURIComponent(q));
                 const data = await r.json();
                 const results = data.results || [];
                 lastItems = results;
@@ -109,15 +117,19 @@
                 return;
             }
             suggest.innerHTML = items.map(it => {
-                const meta = [it.released, it.rating ? '★' + it.rating : ''].filter(Boolean).join(' · ');
+                const title = mainName(it);
+                const alt = altName(it);
+                const score = ratingOf(it);
+                const meta = [it.released || it.date, score ? '★' + score : ''].filter(Boolean).join(' · ');
                 return `<div class="item" data-id="${it.id}">
-                    <div><strong>${escapeHtml(it.name)}</strong></div>
+                    <div><strong>${escapeHtml(title)}</strong>
+                    ${alt ? `<span class="meta"> / ${escapeHtml(alt)}</span>` : ''}</div>
                     <div class="meta">${escapeHtml(meta)} · id=${it.id}</div>
                 </div>`;
             }).join('');
             suggest.hidden = false;
             suggest.querySelectorAll('.item[data-id]').forEach(el => {
-                el.addEventListener('click', () => selectGame(parseInt(el.dataset.id, 10)));
+                el.addEventListener('click', () => selectSubject(parseInt(el.dataset.id, 10)));
             });
         }
 
@@ -127,21 +139,49 @@
                 .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        async function selectGame(id) {
+        // Bangumi carries a localised title, RAWG only has the one name
+        function mainName(o) {
+            return o.name_cn || o.name || '';
+        }
+
+        function altName(o) {
+            return (o.name_cn && o.name_cn !== o.name) ? o.name : '';
+        }
+
+        // RAWG returns a plain number, bangumi a {score, rank, ...} object
+        function ratingOf(o) {
+            const r = o.rating;
+            if (r == null) return '';
+            return typeof r === 'object' ? (r.score || '') : r;
+        }
+
+        async function selectSubject(id) {
             suggest.hidden = true;
             status.textContent = 'Loading details...';
             try {
-                const r = await fetch('/api/rawg/game/' + id);
-                const game = await r.json();
-                fillForm(game);
-                status.textContent = `Filled in: ${game.name} (id=${id})`;
+                const r = await fetch(DETAIL_API + id);
+                const detail = await r.json();
+                fillForm(detail);
+                status.textContent = `Filled in: ${mainName(detail)} (id=${id})`;
             } catch (e) {
                 status.textContent = 'Failed to load: ' + e.message;
             }
         }
 
-        function guessType(platforms) {
-            const names = (platforms || []).map(p => (p.platform && p.platform.name || '').toLowerCase());
+        // bangumi anime platform -> our own type enum
+        const PLATFORM_TO_TYPE = {
+            'TV': 'TV',
+            'WEB': 'TV',
+            '剧场版': 'MOVIE',
+            'OVA': 'OVA',
+            'OAD': 'OVA',
+        };
+
+        function guessType(o) {
+            if (o.platform) {                       // bangumi: a single platform string
+                return PLATFORM_TO_TYPE[o.platform] || 'TV';
+            }
+            const names = (o.platforms || []).map(p => (p.platform && p.platform.name || '').toLowerCase());
             if (names.some(n => n.includes('ios') || n.includes('android'))) return 'MOBILE';
             if (names.some(n => n.includes('pc') || n.includes('linux') || n.includes('mac'))) return 'PC';
             if (names.length) return 'CONSOLE';
@@ -149,22 +189,23 @@
         }
 
         function fillForm(g) {
-            document.getElementById('id').value = g.id;
-            document.getElementById('name').value = g.name || '';
-            document.getElementById('summary').value = g.description_raw || '';
-            if (g.released) document.getElementById('release_date').value = g.released;
+            document.getElementById('record-id').value = g.id;
+            document.getElementById('name').value = mainName(g);
+            document.getElementById('summary').value = g.description_raw || g.summary || '';
+            if (g.released || g.date) document.getElementById('release_date').value = g.released || g.date || '';
             const official = document.querySelector('[name=official_links]');
             if (official && g.website) official.value = g.website;
-            const dbLink = document.getElementById('rawg_links');
-            if (dbLink && g.slug) dbLink.value = 'https://rawg.io/games/' + g.slug;
+            const dbLink = document.getElementById(DB_LINK_ID);
+            const linkKey = DB_LINK_KEY === 'slug' ? g.slug : g.id;
+            if (dbLink && linkKey) dbLink.value = DB_LINK_PREFIX + linkKey;
             const typeSel = document.getElementById('type');
-            const mappedType = guessType(g.platforms);
+            const mappedType = guessType(g);
             if (typeSel && mappedType) {
                 for (const opt of typeSel.options) {
                     if (opt.value === mappedType) { typeSel.value = mappedType; break; }
                 }
             }
-            input.value = g.name || '';
+            input.value = mainName(g);
         }
 
         const debounced = debounce(doSearch, 500);

@@ -59,7 +59,15 @@ def game_new():
         db.session.commit()
         return redirect(url_for('game.games'))
 
-    return render_template('game/games_new.html', search_api='/api/rawg/search')
+    return render_template(
+        'game/games_new.html',
+        search_api='/api/rawg/search',
+        detail_api='/api/rawg/game/',
+        id_field='id',
+        db_link_id='rawg_links',
+        db_link_prefix='https://rawg.io/games/',
+        db_link_key='slug',
+    )
 
 
 @game_bp.route("/<int:game_id>")                                 #Handles GET requests for /games/<game_id>, showing the detail page of the game with the given ID.

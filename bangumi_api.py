@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 import requests
 from pathlib import Path
-import bangumi_index
 import uuid
 from db import db
 from sqlalchemy import inspect
@@ -12,44 +11,48 @@ BANGUMI_UA = "Recorder/0.1 (https://github.com/Civinb/Recorder.git)"
 ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
 bangumi_bp = Blueprint('bangumi', __name__, url_prefix="/api/bangumi")
 
-
-
-@bangumi_bp.route("/index/info")
-def bangumi_index_info():
-    return jsonify(bangumi_index.index_info())
-
-
-
-@bangumi_bp.route("/index/build", methods=["POST"])
-def bangumi_index_build():
+@bangumi_bp.route("/search", methods=["POST", "GET"])
+def anime_search():
+    """Search for anime through the Bangumi API"""
+    keyword = request.args.get("query", "")
     try:
-        result = bangumi_index.build_index()
-        return jsonify({"ok": True, **result})
-    except FileNotFoundError as e:
-        return jsonify({"ok": False, "error": str(e)}), 400
-    except Exception as e:
-        current_app.logger.exception("Failed to build the bangumi index")
-        return jsonify({"ok": False, "error": str(e)}), 500
+        response = requests.post(
+            f"{BANGUMI_API_BASE}/search/subjects",
+            params={
+                "limit": 20, "offset": 0
+            },
+            json={
+                "keyword": keyword,
+                "filter": {
+                    "type": [2]
+                },
+            },
+            headers={"User-Agent": BANGUMI_UA},
+            timeout=10
+        )
+        response.raise_for_status()
+        data = response.json()
+        return jsonify({"count": data["total"], "results": data["data"]})
+    except requests.exceptions.RequestException as e:
+        print(f"Bangumi API request failed: {e}")   # <- switched to print so it also runs outside Flask
+        return jsonify({"count": 0, "results": []}), 502
+    
 
-
-@bangumi_bp.route("/search")
-def bangumi_search():
-    q = request.args.get("q", "")
+@bangumi_bp.route("/anime/<int:anime_id>", methods=["GET"])
+def get_anime_details(anime_id: int):
     try:
-        results = bangumi_index.search(q, limit=15)
-        return jsonify({"ok": True, "results": results})
-    except FileNotFoundError as e:
-        return jsonify({"ok": False, "error": str(e)}), 400
+        response = requests.get(
+            f"{BANGUMI_API_BASE}/subjects/{anime_id}",
+            headers={"User-Agent": BANGUMI_UA},
+            timeout=10
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Bangumi API request failed: {e}")
+        return None
 
-
-@bangumi_bp.route("/subject/<int:subject_id>")
-def bangumi_subject(subject_id):
-    data = bangumi_index.get_subject(subject_id)
-    if not data:
-        return jsonify({"ok": False, "error": "Subject not found"}), 404
-    return jsonify({"ok": True, "subject": data})
-
-
+    
 def _download_bangumi_cover(subject_id: int) -> str | None:
     """Call the Bangumi API for the cover URL, download it to static/uploads/animePic/ and return the file name"""
     try:
