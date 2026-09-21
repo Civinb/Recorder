@@ -1,12 +1,10 @@
 # Recorder
 
-A local Flask app for tracking the anime you watch and the games you play. Search [Bangumi](https://bgm.tv/) (anime) or [RAWG](https://rawg.io/) (games) to fill in an entry and download its cover automatically.
+A local Flask app for tracking the anime you watch and the games you play (Categories such as movies will be added later.). Search [Bangumi](https://bgm.tv/) (anime) or [RAWG](https://rawg.io/) (games) to fill in an entry and download its cover automatically.
 
 ## Getting started
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
 pip install -r requirements.txt
 
 $env:RAWG_API_KEY = "your-key"   # optional, for game search: https://rawg.io/apidocs
